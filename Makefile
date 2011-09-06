@@ -1,11 +1,11 @@
 #BOINC settings - change BOINC_DIR to your liking
-BOINC_DIR = ../../../boinc
+BOINC_DIR = ../../
 BOINC_API_DIR = $(BOINC_DIR)/api
 BOINC_LIB_DIR = $(BOINC_DIR)/lib
 
 #JsonCpp
 JSONCPP_INC_DIR = JsonCpp/include
-JSONCPP_LIB_DIR = JsonCpp/libs/linux-gcc-4.5.2
+JSONCPP_LIB_DIR = JsonCpp/libs/linux-gcc-*
 
 OPENGL_LIBS = -lGL -lglut -lGLU
 CURL_LIBS = `curl-config --libs`
@@ -62,6 +62,6 @@ screensaver: main.o graphics.o sprites.o objects.o resources.o networking.o $(BO
 	$(BOINC_API_DIR)/libboinc_graphics2.a \
 	$(BOINC_API_DIR)/libboinc_api.a \
 	$(BOINC_LIB_DIR)/libboinc.a \
-	$(JSONCPP_LIB_DIR)/libjson_linux-gcc-4.5.2_libmt.a \
+	$(JSONCPP_LIB_DIR)/libjson_linux-gcc-*_libmt.a \
 	$(LIBRARIES)
 
