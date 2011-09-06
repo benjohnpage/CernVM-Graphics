@@ -178,6 +178,7 @@
     \item spriteDisplay
     \item slideshow
     \item gridshow
+    \item panSprite
   \end{enumerate}
 
   To use them simply set the ``type'' parameter to the correspending name.
@@ -360,6 +361,29 @@
       "sprites"    : "histograms",
       "timeout"    : 100,
       "numCells"   : 2
+    }  
+  \end{verbatim}
+
+  \subsubsection{panSprite}
+  This object displays a single sprite by drawing an area of the sprite and
+  panning across to display all of it. It can pan either vertically or
+  horizontally depending on the settings provided. It accepts both
+  normalised and non-normalised coordinates. It requires the drawn
+  dimensions, the period (in frames) of panning and a value for the width
+  or height that is grabbed from the image (we call this the display width).
+  If both a display height and display width are provided there will be an
+  error and the app will exit. The non-specified display dimension is taken
+  as the full length of that axis. For example, for a vertically large image
+  to pan vertically you could write:
+
+
+  \begin{verbatim}
+    {
+      "type"       : "panSprite",
+      "dimensions" : { "x": 627, "y": 0, "w": 300, "h": 270, 
+                       "displayH" : "270" },
+      "sprite"    : "tallImage",
+      "period"    : 100
     }  
   \end{verbatim}
 

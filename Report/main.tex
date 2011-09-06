@@ -213,8 +213,9 @@
     The standard method of deciding this is to check the remote file's
     modification timestamp, but the notion of `time' within a VM is 
     difficult as any pausing/resuming will cause a de-sync with host time. 
-    Therefore we decided to simply download any configuration and resource
-    files and compare them against the old ones.
+    The solution to this problem is to redownload the \json{} files, and
+    compare them against the old ones. These files are only small and so do
+    not greatly limit the rate of refreshing.
 
     The configuration of all these abstractions can be found in the
     documentation provided with the package.
