@@ -30,8 +30,8 @@
     \cernvmgraphics{} is a cross platform application designed to create a 
     visual display for \cernvm{}-based physics applications distributed by 
     the \boinc{} infrastructure. It is based upon web technologies such as 
-    HTTP and \json{} to allow ease of display layout and is designed in such
-    a way to ease the addition of extra functionality.
+    HTTP and \json{} to simplify laying out displays and is designed to ease
+    the addition of extra functionality.
     This paper presents an overview of the development of \cernvmgraphics{}.
     It covers the original motivation for the graphics application, the
     constraints laid out by the framework, the design decisions made in 
@@ -50,7 +50,7 @@
     community has begun to use virtual machines to distribute and run the 
     code. This, however, presents a usability problem to any non-physicist.
     Most users expect computers to provide GUIs, but any physics code
-    running on a virtual machine is written for the terminal, which are not 
+    running on a virtual machine is written for the terminal, which is not 
     commonly regarded as visually appealing. \cernvmgraphics{} is the result
     of a will to solve this difficulty within the system presented by both 
     \boinc{} and \cernvm{} \cite{cernvmIntroduction}. A screenshot of the 
@@ -76,8 +76,10 @@
     which include \opengl{} and \curl{}. From this grounding we have built
     \cernvmgraphics{} to be an easily configurable, with \json{}, graphics 
     application that takes its configuration and resources from within a 
-    \cernvm{} virtual machine by means of HTTP transfer. This allowed us to
-    set up the structure we have today, described in figure \ref{structure}.
+    \cernvm{} virtual machine by means of HTTP transfer. 
+    
+    \cernvmgraphics{} now joins the \cernvm{}/\boinc{} structure in a way
+    described in figure \ref{structure}.
 
     \begin{figure}[hbt]
       \label{structure}
@@ -139,7 +141,7 @@
 
   \section{ Design Decisions }
     We began with a will to replicate a simple slideshow screensaver, moving
-    through a selection of physics images. Though power that \opengl{} 
+    through a selection of physics images. Though the power that \opengl{} 
     provides is great, the code required to display a simple 2D image is 
     quite long - providing features that are commonly unnecessary. 
     Therefore we created our first abstraction - the sprite class. In short 
@@ -161,13 +163,13 @@
     provides an ``Object'' class from which all useful objects are
     descended. These children are meant to provide both a constructor, which
     accepts a \json{} node that describes the object, and a render function,
-    which acts appropriately on the provided description. These
-    descendants are polymorphically stored in a vector which calls each
-    render function once every frame.
+    which acts appropriately on the provided description. Instances of these
+    children are stored in a vector which calls each render function once 
+    every frame.
 
     For this display to replace completely a \cernvm{} terminal window (and 
     especially in the case of the user) we realised that we needed a way to 
-    get at an error output. What's more, it would be quite useful for a 
+    show an error output. What's more, it would be quite useful for a 
     user to be able to press a key and be able to see different information
     - for example, providing an explanation of the physics pictures or
     separating \boinc{} user information from the physics; this provoked the

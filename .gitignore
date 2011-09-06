@@ -1,3 +1,8 @@
 *.o
 JsonCpp/*
 screensaver
+*.log
+*.aux
+*.pdf
+dispFiles
+stderrgfx.txt

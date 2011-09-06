@@ -53,7 +53,7 @@ double updatePeriod; //Defaults to 0
 string forcedConfigFile;
 Json::Value appConfig;
 
-void loadConfiguration( CURL* indexHandle )
+void updateConfiguration( CURL* indexHandle )
 {
   //Open config file (default name "/index.json")
   string indexFilename;
@@ -91,7 +91,8 @@ void loadConfiguration( CURL* indexHandle )
     boinc_close_window_and_quit("Aborting...");
   }
 
-  // Check for changes to the display by comparing new against old
+  // Is this a new configuration or simply an update to the current one?
+  // If the two configurations are the same then there may be new images
   if (appConfig == newConfig)
   {
     // If the resources also haven't changed then nothing has changed, so
@@ -99,65 +100,65 @@ void loadConfiguration( CURL* indexHandle )
     Resources::ResourcesMap newResources;
     newResources = Resources::loadResources(newConfig["resources"]);
 
-    if (newResources == Resources::resourcesMap)
-      return;
+    if (newResources != Resources::resourcesMap)
+    {
+      // Resources have changed, so save the new resource node and go
+      // get the new sprites
+      Resources::resourcesMap = newResources;
+
+      Graphics::removeSprites();
+      Json::Value sprites = newConfig["sprites"];
+      Graphics::loadSprites(sprites);
+    }
 
     // Maybe one day a more intelligent solution can be employed as 
     // a lot of file downloading/copying is taking place. This is currently
     // because if you were to check the time of a file served from a VM it
     // would be incorrect due to the pausing/resuming of the VM.
   }
-
-  // Clear the current configuration
-  Objects::removeObjects();
-  Graphics::removeSprites();
-
-  /////////////
-  // LOADING //
-  /////////////
-
-  //Load the resources
-  Json::Value resources = newConfig["resources"];
-  Resources::resourcesMap = Resources::loadResources(resources);
-
-
-  //Find the sprites and load them
-  Json::Value sprites = newConfig["sprites"];
-  
-  if (sprites["external"].isBool())
-    if (sprites["external"] == true)
-    {
-      string resource = sprites["resource"].asString();
-      string node = sprites["node"].asString();
-      sprites = Resources::getResourceNode(resource, node);
-    }
-  
-  Graphics::loadSprites(sprites);
-
-
-  //Load the new objects
-  Json::Value objects = newConfig["objects"];
-  Objects::loadObjects(objects);
-
-  // General settings/sanity checks
-  if ( newConfig["settings"]["refresh"] . isNull() )
-  {
-    updatePeriod = 0;
-  }
   else
   {
-    if ( newConfig["settings"]["refresh"].isNumeric() )
-      updatePeriod = newConfig["settings"]["refresh"].asDouble(); //Global
+    // It's a new configuration, so remove the old and load the new
+
+    /////////////
+    // LOADING //
+    /////////////
+
+    //Load the resources (automatic removal upon assignment)
+    Json::Value resources = newConfig["resources"];
+    Resources::resourcesMap = Resources::loadResources(resources);
+
+
+    //Find the sprites and load them
+    Graphics::removeSprites();
+    Json::Value sprites = newConfig["sprites"];
+    Graphics::loadSprites(sprites);
+
+
+    //Load the new objects
+    Objects::removeObjects();
+    Json::Value objects = newConfig["objects"];
+    Objects::loadObjects(objects);
+
+    // General settings/sanity checks
+    if ( newConfig["settings"]["refresh"] . isNull() )
+    {
+      updatePeriod = 0;
+    }
     else
     {
-      fprintf( stderr, "Nonsense refresh time\n" );
-      boinc_close_window_and_quit( "Aborting..." );
+      if ( newConfig["settings"]["refresh"].isNumeric() )
+        updatePeriod = newConfig["settings"]["refresh"].asDouble(); //Global
+      else
+      {
+        fprintf( stderr, "Nonsense refresh time\n" );
+        boinc_close_window_and_quit( "Aborting..." );
+      }
     }
+
+    // Accept the new configuration
+    appConfig = newConfig;
   }
-
-
-  // Accept the new configuration
-  appConfig = newConfig;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -184,7 +185,7 @@ void app_graphics_render(int xs, int ys, double timestamp)
       {
         using Networking::FileInformation;
         FileInformation indexInfo;
-        indexInfo . finishResponse = &loadConfiguration;
+        indexInfo . finishResponse = &updateConfiguration;
         fileDownloader->addFile("/index.json", indexInfo);
       }
 

@@ -1,4 +1,4 @@
 all: report
 
 report:
-	pdflatex --job-name="boincGraphics" main.tex
+	pdflatex --jobname="CernVM-Graphics" main.tex

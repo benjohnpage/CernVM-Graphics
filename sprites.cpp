@@ -9,6 +9,7 @@
 #include "graphics.h"
 #include "boincShare.h"
 #include "networking.h"
+#include "resources.h"
 
 //JsonCPP
 #include "json/json.h"
@@ -281,6 +282,14 @@ void Graphics::Sprite::blit( int xScr, int yScr, int wScr, int hScr,
 
 void Graphics::loadSprites(Json::Value sprites)
 {
+  if (sprites["external"].isBool())
+    if (sprites["external"] == true)
+    {
+      string resource = sprites["resource"].asString();
+      string node = sprites["node"].asString();
+      sprites = Resources::getResourceNode(resource, node);
+    }
+  
   //Loads a series of sprite groups.
   for (Json::ValueIterator itr = sprites.begin(); 
        itr != sprites.end();
