@@ -1,0 +1,23 @@
+{
+  "sprites" :
+  {
+    "__main__" :
+    [
+      {"name" : "event", "file" : "/event.png"}
+    ],
+    "events"    : [ "/event.png" ],
+    "histograms": [ "/d01-x01-y01.png", "/d02-x01-y01.png", "/d03-x01-y01.png", "/d04-x01-y01.png", "/d05-x01-y01.png", "/d06-x01-y01.png" ]
+  },
+  
+  "jobMetaData":
+  {
+    "Beam" : "ee",
+    "Process" : "zhad",
+    "Energy" : "133 GeV",
+    "Cuts" : "-",
+    "Generator" : "herwig++",
+    "Version" : "2.5.1",
+    "Tune" : "LHC-UE7",
+    "Events": 100
+  }
+}

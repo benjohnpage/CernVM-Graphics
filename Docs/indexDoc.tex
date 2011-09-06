@@ -1,0 +1,367 @@
+\documentclass[a4paper]{article}
+
+\newcommand{\cernvmgraphics}{CernVM-Graphics}
+\newcommand{\json}{JSON}
+\title{Index.json - The Configuration File For \cernvmgraphics{}}
+\author{Ben Page}
+
+\begin{document}
+\maketitle
+
+\section{Overview}
+  index.json is a \json{} formatted file that describes what appears in
+  \cernvmgraphics{} - think of it like HTML to any web browser. Like any
+  \json{} file we require a root element.  The root element contains three 
+  nodes called ``resources'', ``sprites" and ``objects''. ``resources'' is 
+  an object which describes external ``resource'' files; ``sprites'' is an 
+  object that describes the location of the images or 'sprites' that 
+  appear in the program and ``objects'' is a list of json objects that 
+  describe controls/widgets or 'objects' that appear in the 
+  \cernvmgraphics{}.
+
+\section{Resources}
+  ``resources'' is formatted as a dictionary of ``key'' : ``value'' pairs 
+  where the key describes the internal name of the resource, and the value 
+  the filename. This allows us to externalise things such as images 
+  (sprites) and metadata, as the resource provider may not care about how
+  it is displayed. Resource files are simply a root node that contains
+  a collection of nodes that are requested by the rest of the program. So
+  if you have externalised your sprites then  your resources file may look
+  something like this:
+
+  \begin{verbatim}
+  {
+    "sprites":
+    {
+      "__main__" : 
+      {
+        "sprite1" : "file1.png",
+        "sprite2" " "file2.png"
+      }
+    }
+  }
+  \end{verbatim}
+
+  The exact formatting of how to do things like this is shown in the 
+  following sections.
+
+\section{Sprites}
+  \subsection{The ``sprites'' node and sprite groups}
+  ``sprites'' is an object that either describes the sprites to be used, or
+  gives a resource node that describes the sprites to be used. The json
+  description of sprites to be used is the same either inside or outside of
+  this file. To give a resource node the ``sprites'' elements looks such:
+
+  \begin{verbatim}
+    "sprites" :
+    {
+      "external" : true,
+      "resource" : resourceName,
+      "node"     : nodeName
+    }
+  \end{verbatim}
+
+  The boolean ``external'' is required to be true if the sprites are stored
+  externally, in a resource. The internal name of the resource (as defined 
+  in section 1.1) is provided as the value to the key ``resource''. The json
+  node within this resource is provided as the value to the key ``node''.
+
+  As noted before, internal or external sprite descriptions are the same.
+  The first thing to note is that sprites are always given in ``groups".
+  This is because certain ``objects" can take an entire group of sprites at
+  one time (for example, a slideshow uses a group of sprites).
+
+  The ``sprites'' element is a dictionary whose keys are the group names and
+  values are a list of objects which describe the sprite settings. For
+  example:
+
+  \begin{verbatim}
+    "sprites" :
+    {
+      "myGroup" : 
+      [
+        {"name": "sprite1", "file" : "sprite1.png"},
+        {"name": "spritez", "file" : "spritez.png"}
+      ]
+    }
+  \end{verbatim}
+
+  This defines a group of sprites called ``myGroup''. Within this group we
+  have two sprites - named ``sprite1'' and ``spritez'' which load files
+  ``sprite1.png'' and ``spritez.png'' respectively, from the VM.
+
+  To be able to refer to sprites without the group name we have reserved one
+  group name - ``\_\_main\_\_''. Any sprites placed in this group will be
+  accessible (within an object) by internal name only, no need to state the 
+  group.
+
+  \subsection{Sprite objects}
+  Each sprite object can be of two different types - a full object, or just
+  a string that describes the file location. That is a group defined as
+  below is entirely valid:
+
+  \begin{verbatim}
+    "myGroup" : 
+    [
+      "sprite1.png",
+      {"name": "spritez", "file" : "spritez.png"}
+    ]
+  \end{verbatim}
+
+  It is, however, very difficult (and there is no standard way) to get at
+  the ``nameless'' sprite via an object. However an object (for example a
+  slideshow) will still be able to use it, if it is given the entire group
+  to handle. This comes in handy if you simply want to set up a series of
+  slides, and only care that they're grouped together, e.g.:
+
+  \begin{verbatim}
+    "slides" : ["slide1.png", "slide2.png", "slide3.png", "slide4.png"]
+  \end{verbatim}
+
+  The sprite object currently has 2 parameters - the internal name, and the
+  file to load and so can look like:
+
+  \begin{verbatim}
+    {
+      "name" : spriteName,
+      "file" : spriteFilename
+    }
+  \end{verbatim}
+
+  ``spriteName'' is the internal name of the sprite, and spriteFilename is 
+  the filename to load from the VM.
+
+\section{Coordinates}
+  A brief aside on coordinates within the graphics application. Below,
+  everything is given in non-normalised cartesian coordinates. By
+  ``non-normalised'' I mean that an increment of one in the x or y dimensio
+  means one pixel in that direction. What's more the origin is the centre
+  of the window. This means that non-normalised coordinates will range from
+  $-w/2 < x < w/2$, $-h/2 < y < h/2$.
+
+  To allow for easy scaling to fullscreen (as any good screensaver should)
+  the graphics app also supports normalised coordinates. These are fractions
+  of the ``drawable width'' and ``drawable height'', and mean that the
+  coordinates are in the range $-0.5 < x < 0.5$, $-0.5 < y < 0.5$. The 
+  concept of the ``drawable'' sizes is to do with keeping a fixed aspect 
+  ratio, regardless of the target platforms resolution. Currently this 
+  aspect ratio is fixed at 16:10, so the coordinates respect these sizes.
+
+
+\section{Objects} 
+\subsection{Overview}
+  ``objects'' is a list of json objects (or views, but we first discuss the
+  simplistic case of one view), which each describe a control/widget
+  or an 'object'. This json object is only required to specify a type of 
+  object with key ``type'' and a value being one of the names described in 
+  the sections below. The ``objects'' entry would therefore look akin to 
+  this:
+
+  \begin{verbatim}
+    "objects" :
+    [
+      {
+        "type" : "coolObject",
+        //"coolObject" parameters
+      },
+      {
+        "type" : "awesomeObject",
+        //"awesomeObject" parameters
+      }
+    ]
+  \end{verbatim}
+
+  The objects currently supported by the graphics app are:
+  \begin{enumerate}
+    \item boincValue
+    \item stringDisplay
+    \item spriteDisplay
+    \item slideshow
+    \item gridshow
+  \end{enumerate}
+
+  To use them simply set the ``type'' parameter to the correspending name.
+  The positioning of objects is always given in pixels and is cartesian
+  (bottom-left origin).
+  They are described soon, but first we must discuss ``views''.
+
+  \subsection{Views}
+  Simply put a view is a collection of objects that you want to be
+  displayed at any given time. To switch between views you press any of the
+  number keys (NOTE - only tested on Ubuntu). To set up a view in the config
+  file, you simply make the top level node ``objects'' a list of lists of
+  objects. Each list is then a view, and they are displayed in the order
+  that they are declared (with the first being the default). This would look
+  something like this:
+
+  \begin{verbatim}
+    objects:
+    [
+      [
+        //View 1
+        {
+          //Object 1 in view 1
+        },
+        {
+          //Object 2 in view 1
+        }
+      ],
+      [
+        //View 2
+        {
+          //Object 1 in view 2
+        },
+        {
+          //Object 2 in view 2
+        }
+      ]
+      //etc
+    ]
+  \end{verbatim}
+
+  If you do not want to have multiple views, then just set the objects up
+  as given in the ``objects'' section.
+
+  \subsection{The Objects}
+
+  \subsubsection{boincValue}
+  This object displays a boinc parameter at a given place on the screen.
+  The current supported Boinc parameters are:
+
+  \begin{enumerate}
+    \item username
+    \item credit
+  \end{enumerate}
+
+  Parameters required for this object are the prefix (text prefixing the
+  value), the dimensions and the value type. The value types accepted are
+  given EXACTLY above. An example of the json object would be:
+
+  \begin{verbatim}
+    {
+      "type"       : "boincValue",
+      "dimensions" : {"x" : 40, "y" : 50},
+      "valueType"  : "username", //could be "credit"
+      "prefix"     : "The current user is: "
+    }
+  \end{verbatim}
+
+  \subsubsection{stringDisplay}
+  This object displays a collection of key-value pairs, split apart by
+  a delimiter. The position given by the dimensions describes the bottom
+  left of the top string. The strings are given as a map of key value pairs.
+  The keys should be strings, but the values can be strings or numbers. Any
+  number will be interpretted as an energy in GeV and printed as such.
+  This map can either be given internally or externally. 
+
+  To do it internally provide the parameter ``strings'', e.g.:
+
+  \begin{verbatim}
+    {
+      "type"       : "stringDisplay",
+      "dimensions" : {"x" : 400, "y" : 10},
+      "strings"    :
+      {
+        "Energy"  : 12,
+        "Cuts"    : "None"
+        "Process" : "ee->mu mu"
+      },
+      "delimiter"  : ": "
+    }
+  \end{verbatim}
+  
+  To do it externally provide the boolean ``external'' as true, the 
+  parameter ``resource'' as the internal name of the resource being used 
+  and ``node'' as the to use from within that resource, e.g.:
+  
+  \begin{verbatim}
+    {
+      "type"       : "stringDisplay",
+      "dimensions" : {"x" : 400, "y" : 10},
+      "delimiter"  : ": ",
+      "external"   : true,
+      "resource"   : resourceName,
+      "node"       : nodeInResource
+    }
+  \end{verbatim}
+
+  If you wish to take a block of these strings but only display (for
+  example) 3 at a time, then you can (optionally) set the parameter
+  ``maxLines''. If you do do this, though, as the program isn't that smart 
+  you must provide ``lineWidth'' as well, i.e. the spacing (in characters) 
+  of the longest line. For example this could be:
+
+  \begin{verbatim}
+    {
+      "type"       : "stringDisplay",
+      "dimensions" : {"x" : 400, "y" : 10},
+      "strings"    :
+      {
+        "Energy"  : 12,
+        "Cuts"    : "None"
+        "Process" : "ee->mu mu"
+      },
+      "delimiter"  : ": ",
+      "maxLines"   : 1,
+      "lineWidth"  : 18
+    }
+  \end{verbatim}
+
+
+  \subsubsection{spriteDisplay}
+  This object displays a single sprite at a given position. The required
+  parameters are: the internal name of the sprite and the dimensions of the
+  display (scaling is automatically supported). For example this could be:
+
+  \begin{verbatim}
+    {
+      "type"       : "spriteDisplay",
+      "sprite"     : "mySprite",
+      "dimensions" : {"x" : 0, "y": 0, "w" : 100, "h" : 100}
+    }
+  \end{verbatim}
+
+  \subsubsection{slideshow}
+  This object displays a slideshow of sprites at a given position. The 
+  required parameters are: the internal name of the group, the dimensions
+  of the display (scaling is automatically supported) and the time between
+  slides (given as a number of frames). The dimensions can either be the
+  string ``fullscreen'', or a normal dimensions object. For example the
+  slideshow object could be:
+
+  \begin{verbatim}
+    {
+      "type"       : "slideshow",
+      "sprites"    : "mySlides",
+      "dimensions" : {"x" : 0, "y": 0, "w" : 100, "h" : 100},
+      "timeout"    : 100
+    }
+  \end{verbatim}
+
+  The object with the key of ``dimensions'' could simply be the string
+  ``fullscreen'' if the slideshow was wanted fulscreen.
+
+  \subsubsection{gridshow}
+  This objects displays a slideshow of a grid of sprites. That is, if you
+  give it a group of 16 pictures, telling it to display a 2x2 grid, it will
+  cycle through the 16, four at a time. The setup is very similar to a
+  slideshow object, in fact if you set up a 1x1 gridshow, it will behave
+  identically to a slideshow.
+  The required parameters are: the internal name of the group, the position,
+  the individual cell dimensions, the number of cells wide that the grid
+  will be, and the total number of cells to display per slide. For example
+  this could be:
+
+  \begin{verbatim}
+    {
+      "type"       : "gridshow",
+      "dimensions" : {"x": 627, "y": 0, "cellWidth": 299, 
+                      "cellHeight": 270, "cellsWide" : 1},
+      "sprites"    : "histograms",
+      "timeout"    : 100,
+      "numCells"   : 2
+    }  
+  \end{verbatim}
+
+
+\end{document}

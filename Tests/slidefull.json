@@ -1,0 +1,22 @@
+{
+  "resources" :
+  {
+    "sprites" : "resources.json"
+  },
+  "sprites" :
+  {
+    "external" : true,
+    "resource" : "sprites",
+    "node" : "sprites"
+  },
+  "objects" :
+  [
+    {
+      "type" : "slideshow",
+      "timeout": 100,
+      "dimensions" : "fullscreen",
+      "sprites" : "events"
+    }
+  ]
+}
+

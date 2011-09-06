@@ -1,0 +1,69 @@
+{
+  "settings"  :
+  {
+    "refresh" : 5
+  },
+
+  "resources" :
+  {
+    "resources" : "/resources.json"
+  },
+
+  "sprites" :
+  {
+    "external" : true,
+    "resource" : "resources",
+    "node"     : "sprites"
+  },
+
+  "objects" :
+  [
+     [ 
+      {
+        "type"       : "slideshow",
+        "timeout"    : 100,
+        "dimensions" : {"x": -0.5, "y": -0.1426, "w" : 0.619, "h" : 0.643},
+        "sprites"    : "events"
+      },
+      {
+        "type"       : "gridshow",
+        "dimensions" : {"x": 0.19, "y": -0.5, "cellWidth": 0.31, 
+                        "cellHeight": 0.5, "cellsWide" : 1},
+        "sprites"    : "histograms",
+        "timeout"    : 100,
+        "numCells"   : 2
+      },
+      {
+        "type"       : "boincValue",
+        "valueType"  : "username",
+        "dimensions" : {"x": -0.291,"y": -0.481},
+        "prefix"     : "User: "
+      },
+      {
+        "type"       : "boincValue",
+        "valueType"  : "credit",
+        "dimensions" : {"x": -0.49, "y": -0.481},
+        "prefix"     : "Credit: "
+      },
+      {
+        "type"       : "strings",
+        "dimensions" : {"x": -0.49, "y": -0.222},
+        "external"   : true,
+        "resource"   : "resources",
+        "node"       : "jobMetaData",
+        "maxLines"   : 4,
+        "lineWidth"  : 20,
+        "delimiter"  : ": "
+      }
+    ],
+    [
+      {
+        "type"       : "panSprite",
+        "dimensions" : {"x": -0.5, "y": -0.5, "w" : 1.0, "h" : 1.0, "displayW": 0.625},
+        "sprite"    :  "event",
+        "period"    :  200
+      }
+    ]
+  ]
+}
+
