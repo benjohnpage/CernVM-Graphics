@@ -98,23 +98,30 @@ void Objects::removeObjects()
 Objects::Object::Object(Json::Value data) :
  self_data( data ), self_x(0), self_y(0), self_w(0), self_h(0)
 {
-  if ( data["dimensions"].isObject() )
+  Json::Value dimensions = data["dimensions"];
+  if ( dimensions.isObject() )
   {
     // Coordinates are stored as doubles, but interpretted as either
-    // pixel coordinates or fractional. The interpretation depends upon
-    // whether "x" is an integer or a double.
-    if ( data["dimensions"]["x"].isInt() )
+    // pixel coordinates or fractional. If ANY dimension is a double, then
+    // they all should be (why would you use a double coordinate otherwise?)
+
+    self_coordType = Objects::NON_NORM;
+
+    for ( Json::ValueIterator itr  = dimensions.begin();
+                              itr != dimensions.end();
+                              itr ++ )
     {
-      self_coordType = Objects::NON_NORM;
+      string key = itr.key().asString();
+
+      if (dimensions[ key ] . isDouble() )
+      {
+        self_coordType = Objects::NORM;
+        break;
+      }
     }
 
-    if ( data["dimensions"]["x"].isDouble() )
-    {
-      self_coordType = Objects::NORM;
-    }
-
-    self_x = data["dimensions"]["x"].asDouble();
-    self_y = data["dimensions"]["y"].asDouble();
+    self_x = dimensions["x"].asDouble();
+    self_y = dimensions["y"].asDouble();
 
   }
 }
