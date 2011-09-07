@@ -237,6 +237,11 @@ void Graphics::Sprite::drawArea( double xFrac, double yFrac,
   this -> blit( x, y, w, h, xImgFrac, yImgFrac, wImgFrac, hImgFrac );
 }
 
+double Graphics::Sprite::aspectRatio()
+{
+  return double(self_imageWidth) / double(self_imageHeight);
+}
+
 void Graphics::Sprite::blit( int xScr, int yScr, int wScr, int hScr,
                               double xTex, double yTex, double wTex,
                                                         double hTex )

@@ -349,15 +349,15 @@
   slideshow object, in fact if you set up a 1x1 gridshow, it will behave
   identically to a slideshow.
   The required parameters are: the internal name of the group, the position,
-  the individual cell dimensions, the number of cells wide that the grid
-  will be, and the total number of cells to display per slide. For example
-  this could be:
+  the individual cell dimensions (given as normal "w" and "h"), the number
+  of cells wide that the grid will be, and the total number of cells to 
+  display per slide. For example this could be:
 
   \begin{verbatim}
     {
       "type"       : "gridshow",
-      "dimensions" : {"x": 627, "y": 0, "cellWidth": 299, 
-                      "cellHeight": 270, "cellsWide" : 1},
+      "dimensions" : { "x": 627, "y": 0, "w": 299, "h": 270, 
+                       "cellsWide" : 1 },
       "sprites"    : "histograms",
       "timeout"    : 100,
       "numCells"   : 2

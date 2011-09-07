@@ -3,6 +3,7 @@
 
 //Ours
 #include "graphics.h"
+
 //JsonCpp
 #include <json/json.h>
 
@@ -14,6 +15,7 @@
 using std::string;
 using std::vector;
 using std::map;
+using Graphics::Sprite;
 
 namespace Objects
 {
@@ -32,6 +34,10 @@ namespace Objects
       double      self_x;
       double      self_y;
       CoordType   self_coordType;
+
+      double    self_w;
+      double    self_h;
+      void      autoDimensions(Sprite* sprite);
   };
 
   class BoincValue: public Object
@@ -62,8 +68,6 @@ namespace Objects
       SpriteDisplay(Json::Value data);
       void render();
     private:
-      double    self_w;
-      double    self_h;
       string self_spriteName;
   };
 
@@ -73,9 +77,6 @@ namespace Objects
       Slideshow(Json::Value data);
       void render();
     private:
-      double  self_w;
-      double  self_h;
-
       int self_time;
       int self_timeout;
       
@@ -89,8 +90,6 @@ namespace Objects
       Gridshow(Json::Value data);
       void render();
     private:
-      double self_cellWidth;
-      double self_cellHeight;
       int self_cellsWide;
       int self_numCells;
 
@@ -108,8 +107,6 @@ namespace Objects
       void render();
     private:
       string self_sprite;
-      double self_w;
-      double self_h;
 
       int self_panTime;
       int self_panPeriod;

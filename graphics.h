@@ -25,6 +25,7 @@ namespace Graphics
                bool& outHasAlpha, GLubyte** outData);
   
   void drawableWindow( int& windowW, int& windowH );
+  double screenAspect();
 
   void begin2D();
   void end2D();
@@ -60,6 +61,8 @@ namespace Graphics
                     int xImg, int yImg, int wImg, int hImg);
       void drawArea(double xScr, double yScr, double wScr, double hScr,
                     double xImg, double yImg, double wImg, double hImg);
+
+      double aspectRatio(); //Width to height
   };
 
   typedef map<string, Sprite*>     spriteGroup;

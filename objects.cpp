@@ -96,30 +96,71 @@ void Objects::removeObjects()
 }
 
 Objects::Object::Object(Json::Value data) :
- self_data( data ), self_x(0), self_y(0)
+ self_data( data ), self_x(0), self_y(0), self_w(0), self_h(0)
 {
   if ( data["dimensions"].isObject() )
   {
+    // Coordinates are stored as doubles, but interpretted as either
+    // pixel coordinates or fractional. The interpretation depends upon
+    // whether "x" is an integer or a double.
     if ( data["dimensions"]["x"].isInt() )
     {
-      self_x         = data["dimensions"]["x"].asInt();
-      self_y         = data["dimensions"]["y"].asInt();
       self_coordType = Objects::NON_NORM;
     }
 
     if ( data["dimensions"]["x"].isDouble() )
     {
-      self_x         = data["dimensions"]["x"].asDouble();
-      self_y         = data["dimensions"]["y"].asDouble();
       self_coordType = Objects::NORM;
     }
+
+    self_x = data["dimensions"]["x"].asDouble();
+    self_y = data["dimensions"]["y"].asDouble();
+
+  }
+}
+
+void Objects::Object::autoDimensions(Sprite* sprite)
+{
+  // This function contains a lot of oft used functionality for importing
+  // widths and heights for objects. It takes care of automatically
+  // extracting missing dimensions from the aspect ratio of images.
+
+  self_w = self_data["dimensions"]["w"].asDouble();
+  self_h = self_data["dimensions"]["h"].asDouble();
+
+  //Safety
+  if ( (self_w == 0) and (self_h == 0) )
+  {
+    string objectType = self_data["type"].asString();
+    fprintf(stderr, "No dimensions given for %s\n", objectType.c_str());
+    boinc_close_window_and_quit("Aborting...\n");
+  }
+
+  // If a dimension is missing, extract it from the aspect ratio
+  if ( self_w == 0 || self_h == 0 )
+  {
+    // Get a screen based aspect ratio
+    double drawnAspect = sprite -> aspectRatio();
+
+    if (self_coordType == Objects::NORM)
+      drawnAspect /= Graphics::screenAspect();
+
+    if (self_w == 0) 
+      self_w = self_h * drawnAspect;
+    if (self_h == 0)
+      self_h = self_w / drawnAspect;
   }
 }
 
 Objects::Slideshow::Slideshow( Json::Value data ) :
-  Objects::Object( data ), self_w(0), self_h(0), self_time(0),
+  Objects::Object( data ), self_time(0),
   self_timeout(30)
 {
+  self_spriteGroup = data["sprites"].asString();
+  self_spriteIter = Graphics::sprites[ self_spriteGroup ].begin();
+  
+  self_timeout = data["timeout"].asInt();
+
   Json::Value dimensions = data["dimensions"];
   if ( dimensions.isString() )
   {
@@ -143,26 +184,9 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
   }
   else
   {
-    if ( self_coordType == Objects::NON_NORM )
-    {
-      //If they aren't there, then this defaults to 0, which is used to
-      //signify "natural size" in the drawing routine.
-      self_w = data["dimensions"]["w"].asInt();
-      self_h = data["dimensions"]["h"].asInt();
-    }
-
-    if ( self_coordType == Objects::NORM )
-    {
-      //These NEED to be provided - FIXME update docs.
-      self_w = data["dimensions"]["w"].asDouble();
-      self_h = data["dimensions"]["h"].asDouble();
-    }
+    // We assume that the sprites in slideshow are all the same size
+    autoDimensions( self_spriteIter -> second );
   }
-  
-  self_spriteGroup = data["sprites"].asString();
-  self_spriteIter = Graphics::sprites[ self_spriteGroup ].begin();
-
-  self_timeout = data["timeout"].asInt();
 }
 
 
@@ -302,28 +326,21 @@ Objects::SpriteDisplay::SpriteDisplay(Json::Value data) :
   self_spriteName = data["sprite"].asString();
 
   Json::Value dimensions = data["dimensions"];
-  if ( dimensions["w"].isInt() )
-  {
-    self_w = dimensions["w"].asInt();
-    self_h = dimensions["h"].asInt();
-  }
-  if ( dimensions["w"].isDouble() )
-  {
-    self_w = dimensions["w"].asInt();
-    self_h = dimensions["h"].asInt();
-  }
+
+  autoDimensions( Graphics::getSprite( self_spriteName ) );
+
 }
+
 void Objects::SpriteDisplay::render()
 {
+  Sprite* drawSprite = Graphics::getSprite( self_spriteName );
+
   if ( self_coordType == Objects::NON_NORM )
-   Graphics::getSprite( self_spriteName ) -> draw( (int)self_x, 
-                                                   (int)self_y,
-                                                   (int)self_w, 
-                                                   (int)self_h );
+    drawSprite -> draw( (int)self_x, (int)self_y, (int)self_w, 
+                        (int)self_h );
 
   if ( self_coordType == Objects::NORM )
-    Graphics::getSprite( self_spriteName ) -> draw( self_x, self_y,
-                                                    self_w, self_h );
+    drawSprite -> draw( self_x, self_y, self_w, self_h );
 }
 
 Objects::Gridshow::Gridshow(Json::Value data) :
@@ -331,19 +348,12 @@ Objects::Gridshow::Gridshow(Json::Value data) :
 {
   self_spriteGroup = data["sprites"].asString();
 
+  //We start the drawing with the first sprite in the group
+  self_spriteIter = Graphics::sprites[self_spriteGroup].begin() ;
+
   Json::Value dimensions = data["dimensions"];
 
-  //Position and cell dimensions
-  if ( dimensions["cellWidth"].isInt() )
-  {
-    self_cellWidth  = dimensions["cellWidth"].asInt();
-    self_cellHeight = dimensions["cellHeight"].asInt();
-  }
-  if ( dimensions["cellWidth"].isDouble() )
-  {
-    self_cellWidth  = dimensions["cellWidth"].asDouble();
-    self_cellHeight = dimensions["cellHeight"].asDouble();
-  }
+  autoDimensions( self_spriteIter -> second );
 
   //Cell settings
   self_cellsWide  = dimensions["cellsWide"].asInt();
@@ -352,8 +362,6 @@ Objects::Gridshow::Gridshow(Json::Value data) :
   self_time       = 0;
   self_timeout    = data["timeout"].asInt();
 
-  //We start the drawing with the first sprite in the group
-  self_spriteIter = Graphics::sprites[self_spriteGroup].begin() ;
 }
 
 void Objects::Gridshow::render()
@@ -369,19 +377,17 @@ void Objects::Gridshow::render()
   {
     if ( self_coordType == Objects::NON_NORM )
     {
-      int cellX = self_x + gridX * self_cellWidth;
-      int cellY = self_y + gridY * self_cellHeight;
+      int cellX = self_x + gridX * self_w;
+      int cellY = self_y + gridY * self_h;
 
-      drawIter -> second -> draw( cellX, cellY, (int)self_cellWidth, 
-                                  (int) self_cellHeight );
+      drawIter -> second -> draw( cellX, cellY, (int)self_w, (int) self_h );
     }
     if ( self_coordType == Objects::NORM )
     {
-      double cellX = self_x + gridX * self_cellWidth;
-      double cellY = self_y + gridY * self_cellHeight;
+      double cellX = self_x + gridX * self_w;
+      double cellY = self_y + gridY * self_h;
 
-      drawIter -> second -> draw( cellX, cellY, self_cellWidth, 
-                                  self_cellHeight );
+      drawIter -> second -> draw( cellX, cellY, self_w, self_h );
     }
 
     //Do appropriate moving of drawing position
@@ -412,7 +418,7 @@ void Objects::Gridshow::render()
 }
 
 Objects::PanSprite::PanSprite( Json::Value data ) :
-  Objects::Object( data )
+  Objects::Object( data ), self_panTime(0)
 {
   self_sprite = data["sprite"].asString();
 
@@ -424,38 +430,18 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
     boinc_close_window_and_quit("Aborting...");
   }
 
-  if ( dimensions["w"].isInt() )
-  {
-    self_w = dimensions["w"].asInt();
-    self_h = dimensions["h"].asInt();
+  self_w = dimensions["w"].asDouble();
+  self_h = dimensions["h"].asDouble();
 
-    if ( dimensions["displayW"].isInt() )
-    {
-      self_displayDim = dimensions["displayW"].asInt();
-      self_panAxis = HORIZONTAL;
-    }
-    if ( dimensions["displayH"].isInt() )
-    {
-      self_displayDim = dimensions["displayH"].asInt();
-      self_panAxis = VERTICAL;
-    }
+  if ( !dimensions["displayW"].isNull() )
+  {
+    self_displayDim = dimensions["displayW"].asDouble();
+    self_panAxis = HORIZONTAL;
   }
-
-  if ( dimensions["w"].isDouble() )
+  if ( !dimensions["displayH"].isNull() )
   {
-    self_w = dimensions["w"].asInt();
-    self_h = dimensions["h"].asInt();
-
-    if ( dimensions["displayW"].isDouble() )
-    {
-      self_displayDim = dimensions["displayW"].asDouble();
-      self_panAxis = HORIZONTAL;
-    }
-    if ( dimensions["displayH"].isDouble() )
-    {
-      self_displayDim = dimensions["displayH"].asDouble();
-      self_panAxis = VERTICAL;
-    }
+    self_displayDim = dimensions["displayH"].asDouble();
+    self_panAxis = VERTICAL;
   }
 
   self_panDirection = FORWARDS;
@@ -519,8 +505,7 @@ void Objects::PanSprite::render()
       imgY = panFraction * (1.0 - drawnH);
     }
 
-    fprintf(stderr, "imgX:%f, imgW:%f, drawnW:%f, drawnH:%f\n", imgX, (double)imgW, drawnW, drawnH);
-
+    fprintf( stderr, "%f, %f, %f, %f, \n", imgX,   imgY,   drawnW, drawnH );
     drawnSprite-> drawArea( self_x, self_y, self_w, self_h,
                             imgX,   imgY,   drawnW, drawnH );
   }

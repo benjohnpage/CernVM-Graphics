@@ -22,13 +22,12 @@
       {
         "type"       : "slideshow",
         "timeout"    : 100,
-        "dimensions" : {"x": -0.5, "y": -0.1426, "w" : 0.619, "h" : 0.643},
+        "dimensions" : {"x": -0.5, "y": -0.09, "w" : 0.63},
         "sprites"    : "events"
       },
       {
         "type"       : "gridshow",
-        "dimensions" : {"x": 0.19, "y": -0.5, "cellWidth": 0.31, 
-                        "cellHeight": 0.5, "cellsWide" : 1},
+        "dimensions" : { "x": 0.15, "y": -0.5, "h": 0.5, "cellsWide" : 1 },
         "sprites"    : "histograms",
         "timeout"    : 100,
         "numCells"   : 2

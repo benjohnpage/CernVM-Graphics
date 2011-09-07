@@ -16,6 +16,13 @@ using std::stringstream;
 
 
 //Simple helper functions
+double Graphics::screenAspect()
+{
+  // Accepts an original width height aspect ratio (assumedly of an image)
+  // and converts it to a screen fraction one.
+  return 16.0/10.0;
+}
+
 void Graphics::drawableWindow( int& width, int& height )
 {
   //get Window Dimensions
@@ -25,19 +32,19 @@ void Graphics::drawableWindow( int& width, int& height )
   width  = viewPort[2];
   height = viewPort[3];
 
-  // Fix to 16:10
+  // Fix to screen aspect ratio
   
   // Calculate the 16:10 height if width is true
-  int aspectHeight = width/16.0 * 10.0;
+  int aspectHeight = width / Graphics::screenAspect();
 
   //if this is > that the actual height then height takes presidence
   if (aspectHeight > height)
   {
-    width = height / 10.0 * 16.0;
+    width = height * Graphics::screenAspect();
   }
   else
   {
-    height = width / 16.0 * 10.0;
+    height = width / Graphics::screenAspect();
   }
 }
 void Graphics::drawText( string text, double xFrac, double yFrac, 
