@@ -1,16 +1,12 @@
 #include <string>
 #include <sstream>
-#include <cmath>
+#include <iostream>
 #include <cstdio>
-#include <map>
-#include <vector>
 
+using std::cerr;
+using std::endl;
 using std::string;
 using std::stringstream;
-using std::fmod;
-using std::sprintf;
-using std::map;
-using std::vector;
 
 #include "json/json.h"
 
@@ -139,7 +135,7 @@ void Objects::Object::autoDimensions(Sprite* sprite)
   if ( (self_w == 0) and (self_h == 0) )
   {
     string objectType = self_data["type"].asString();
-    fprintf(stderr, "No dimensions given for %s\n", objectType.c_str());
+    cerr << "No dimensions given for " << objectType << endl;
     boinc_close_window_and_quit("Aborting...\n");
   }
 
@@ -175,11 +171,9 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
     //we pretend it was meant to and complain
     if (dimensions != "fullscreen")
     {
-      string error =  "Slideshow - provided dimensions as string, but does";
-             error += "not want fullscreen, interpretting as fullscreen";
-             error += "anyway \n";
-      fprintf(stderr, "ERROR: %s",  error.c_str() );
-      printf ("ERROR: %s", error.c_str() );
+      cerr << "ERROR: Slideshow - provided dimensions as string, but does"
+           << "not want fullscreen, interpretting as fullscreen anyway."
+           << endl;
     }
 
     self_x = -0.5f;
@@ -433,7 +427,7 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   if (dimensions["displayW"].isNull() == dimensions["displayH"].isNull() )
   {
-    fprintf(stderr, "Both/neither of 'displayW' and 'displayH' are set.\n");
+    cerr << "Both/neither of 'displayW' and 'displayH' are set." << endl;
     boinc_close_window_and_quit("Aborting...");
   }
 
@@ -455,7 +449,7 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   if ( data["period"].isNull() )
   {
-    fprintf(stderr, "PanSprite period is NULL, but required.\n");
+    cerr << "PanSprite period is NULL, but required." << endl;
   }
 
   self_panPeriod    = data["period"].asInt();
@@ -512,7 +506,6 @@ void Objects::PanSprite::render()
       imgY = panFraction * (1.0 - drawnH);
     }
 
-    fprintf( stderr, "%f, %f, %f, %f, \n", imgX,   imgY,   drawnW, drawnH );
     drawnSprite-> drawArea( self_x, self_y, self_w, self_h,
                             imgX,   imgY,   drawnW, drawnH );
   }

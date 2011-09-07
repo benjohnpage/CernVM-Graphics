@@ -71,8 +71,8 @@ void Graphics::drawText(string text, int x, int y, float * colour)
   int windowW, windowH;
   Graphics::drawableWindow( windowW, windowH );
 
-  int lineHeightConstant = 20*1.2; //These two work, so guess inv proportion
-  double textScaleConstant = 540*1.2; //Same as above
+  int lineHeightConstant = 25*1.4; //These two work, so guess inv proportion
+  double textScaleConstant = 540*1.4; //Same as above
 
   double textScale = textScaleConstant / windowH;
   int lineHeight = lineHeightConstant / textScale; 

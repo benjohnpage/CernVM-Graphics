@@ -51,14 +51,15 @@
         "resource"   : "resources",
         "node"       : "jobMetaData",
         "maxLines"   : 4,
-        "lineWidth"  : 20,
+        "lineWidth"  : 25,
         "delimiter"  : ": "
       }
     ],
     [
       {
         "type"       : "panSprite",
-        "dimensions" : {"x": -0.5, "y": -0.5, "w" : 1.0, "h" : 1.0, "displayW": 0.625},
+        "dimensions" : { "x": -0.5, "y": -0.5, "w" : 1.0, "h" : 1.0, 
+                         "displayW": 0.625 },
         "sprite"    :  "event",
         "period"    :  200
       }

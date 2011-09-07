@@ -20,11 +20,13 @@
 
 //Standard
 #include <map>
-#include <cstdio>
+#include <iostream>
 #include <cstdlib>
 #include <sstream>
 #include <stdexcept>
 
+using std::cerr;
+using std::endl;
 using std::map;
 using std::stringstream;
 using std::out_of_range;
@@ -43,8 +45,8 @@ Graphics::Sprite* Graphics::getSprite(string groupName, string spriteName)
                                           Graphics::sprites.find(groupName);
   if (groupItr == Graphics::sprites.end())
   {
-    fprintf(stderr, "The requested group \"%s\" does not exist", 
-            groupName.c_str());
+    cerr << "The requested group \"" << groupName 
+         << "\" does not exist" << endl;
     throw out_of_range("Unknown group"); 
   }
 
@@ -52,9 +54,8 @@ Graphics::Sprite* Graphics::getSprite(string groupName, string spriteName)
                                              -> second . find(spriteName);
   if (spriteItr == groupItr -> second.end())
   {
-    fprintf(stderr, 
-            "The requested sprite \"%s\", in group \"%s\" does not exist", 
-            spriteName.c_str(), groupName.c_str());
+    cerr << "The requested sprite \"" << spriteName << "\", in group \"" 
+         << groupName <<"\" does not exist." << endl;
     throw out_of_range("Unknown sprite in group"); 
   }
   return spriteItr->second;
@@ -82,7 +83,7 @@ Graphics::Sprite::Sprite()
 
 Graphics::Sprite::Sprite(string filename)
 {
-  fprintf(stderr, "Creating sprite from %s \n", filename.c_str() );
+  cerr << "Creating sprite from " << filename << endl;
   int width, height;
   bool hasAlpha;
   GLubyte* texturePointer;
@@ -343,7 +344,7 @@ void Graphics::loadSprites(Json::Value sprites)
       }
       catch (const char* msg)
       {
-        fprintf(stderr, "%s \n", msg);
+        cerr << msg << endl;
         boinc_close_window_and_quit("Aborted.");
       }
       

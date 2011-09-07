@@ -1,12 +1,19 @@
 //boinc
 #include "filesys.h"
 
-#include "networking.h"
-
-#include <string>
+//cURL
 #include <curl/curl.h>
 
+//Ours
+#include "networking.h"
+
+// Standard
+#include <string>
+#include <iostream>
 using std::string;
+using std::cerr;
+using std::endl;
+
 Networking::FileDownloader* Networking::fileDownloader;
 
 #ifdef __unix__
@@ -65,8 +72,8 @@ string Networking::FileDownloader::getFile(string filename)
 
     if (result != CURLE_OK) 
     {
-      fprintf(stderr, "CURL Error in getting file \"%s\" - %s\n",
-              filename.c_str(), curl_easy_strerror(result));
+      cerr << "CURL Error in getting file \"" << filename << "\" - "
+           << curl_easy_strerror(result) << endl;
       throw result;
     }
 
@@ -102,7 +109,7 @@ long Networking::FileDownloader::getFileAge( string filename )
     curl_easy_getinfo(easyHandle, CURLINFO_FILETIME, &age);
 
     if (age == -1)
-      fprintf( stderr, "ERROR - the server does not support file ages.\n" );
+      cerr << "ERROR - the server does not support file ages." << endl;
 
     return age;
   }
@@ -136,10 +143,6 @@ void Networking::FileDownloader::addFile(string filename,
   {  
     string localPath = "./dispFiles/" + filename;
     fileInfo . filep = fopen( localPath.c_str(), "w" );
-  }
-  else
-  {
-    fprintf( stderr, "User provided filepointer");
   }
 
   //Make and setup the easyHandle
@@ -210,8 +213,8 @@ void Networking::FileDownloader::process()
         Networking::FileInformation completedFile = 
                                                  self_fileInfos[easyHandle];
         //Report the success
-        fprintf(stderr, "Successful download of file \"%s\"\n",
-                completedFile.filePath.c_str());
+        cerr << "Successful download of file \"" << completedFile.filePath
+             << "\"" << endl;
 
         //Close file and run the finish function (if it exists)
         fclose(completedFile . filep);
@@ -233,8 +236,8 @@ void Networking::FileDownloader::process()
                                                  self_fileInfos[easyHandle];
         string errorDescription = curl_easy_strerror(result);
 
-        fprintf(stderr, "Unhandled error downloading \"%s\" - %s",
-                completedFile.filePath.c_str(), errorDescription.c_str());
+        cerr << "Unhandled error downloading \"" << completedFile.filePath 
+             << "\" - " << errorDescription<< endl;
       }
     }
   }

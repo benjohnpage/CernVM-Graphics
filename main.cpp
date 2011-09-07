@@ -17,13 +17,15 @@
 #define WINDOW_TITLE "LHC@Home 2.0"
 
 
-#include <cstdio>
+#include <iostream>
 #include <cstdlib>
 #include <string>
 #include <fstream>
 
 using std::string;
 using std::ifstream;
+using std::cerr;
+using std::endl;
 
 //JsonCpp
 #include <json/json.h>
@@ -61,8 +63,7 @@ void updateConfiguration( CURL* indexHandle )
   // Or have we been given a forced config file at run time?
   if (forcedConfigFile != "")
   {
-    fprintf(stderr, "Using forced config file: %s \n", 
-                    forcedConfigFile.c_str());
+    cerr << "Using forced config file: " << forcedConfigFile << endl;
     indexFilename = forcedConfigFile;
   }
   else
@@ -74,8 +75,7 @@ void updateConfiguration( CURL* indexHandle )
 
   if (!jsonFile)
   {
-    fprintf( stderr, "Config file \"%s\" not found\n", 
-                     indexFilename.c_str() );
+    cerr << "Config file " << indexFilename << " not found." << endl;
     boinc_close_window_and_quit("Aborting...");
   }
 
@@ -86,8 +86,8 @@ void updateConfiguration( CURL* indexHandle )
   bool parsingSuccessful = reader.parse(jsonFile, newConfig);
   if (!parsingSuccessful)
   {
-    fprintf(stderr, "Provided JSON file\"%s\" is invalid JSON.\n", 
-            indexFilename.c_str());
+    cerr << "Provided JSON file" << indexFilename 
+         << "is invalid JSON." << endl;
     boinc_close_window_and_quit("Aborting...");
   }
 
@@ -151,7 +151,7 @@ void updateConfiguration( CURL* indexHandle )
         updatePeriod = newConfig["settings"]["refresh"].asDouble(); //Global
       else
       {
-        fprintf( stderr, "Nonsense refresh time\n" );
+        cerr << "Nonsense refresh time" << endl;
         boinc_close_window_and_quit( "Aborting..." );
       }
     }

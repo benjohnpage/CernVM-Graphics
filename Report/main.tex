@@ -13,6 +13,8 @@
 \newcommand{\vmport}{12345}
 \newcommand{\einsteinathome}{Einstein@Home}
 \newcommand{\jquery}{jQuery}
+\newcommand{\protovis}{Protovis}
+\newcommand{\googlechart}{Google Chart}
 
 \begin{document}
 
@@ -242,7 +244,7 @@
     that could be useful to provide. For example, \opengl{} is a 3D library
     which has been used only in a 2D way, but it would also be possible to
     add 3D functionality (similar to \einsteinathome{} \cite{einsteinathome}
-    ). One potential criticism to address is that \cernvmgraphics has been
+    ). One potential criticism to address is that \cernvmgraphics{} has been
     written with web technologies in mind, but if one were to point your
     browser to localhost:\vmport{} one would get nothing back. One
     proposition would be to port \cernvmgraphics{} to javascript in order to
@@ -250,6 +252,8 @@
     Technologies such as \jquery{} \cite{jquery} could help provide 
     cross-browser compatibility; what's more \jquery{} plugins, e.g. cycle
     \cite{jquery-cycle}, provide ready made user interface technology.
+    Futhermore javascript packages such as \protovis{} \cite{protovis} and
+    \googlechart{} \cite{gchart} could be used for easy visualisation.
 
   \section{ Conclusions }
     \cernvmgraphics is an easily configurable, extensible solution to the
@@ -276,6 +280,12 @@
 
     \bibitem{jquery-cycle}
       \jquery{} Cycle - http://jquery.malsup.com/cycle
+     
+    \bibitem{protovis}
+      \protovis{} - http://mbostock.github.com/protovis/
+
+    \bibitem{gchart}
+      \googlechart{} - http://code.google.com/intl/es/apis/chart/
 
   \end{thebibliography}
 

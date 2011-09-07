@@ -1,4 +1,3 @@
-
 {
   "settings"  :
   {
@@ -21,16 +20,22 @@
   [
      [ 
       {
+        "type"       : "slideshow",
+        "timeout"    : 100,
+        "dimensions" : {"x": -0.5, "y": -0.09, "w" : 0.63},
+        "sprites"    : "events"
+      },
+      {
         "type"       : "gridshow",
-        "dimensions" : { "x": -0.4, "y": -0.3, "h": 0.4, "cellsWide" : 3 },
+        "dimensions" : { "x": 0.15, "y": -0.5, "h": 0.5, "cellsWide" : 1 },
         "sprites"    : "histograms",
         "timeout"    : 100,
-        "numCells"   : 6
+        "numCells"   : 2
       },
       {
         "type"       : "boincValue",
         "valueType"  : "username",
-        "dimensions" : {"x": -0.49,"y": -0.4},
+        "dimensions" : {"x": -0.291,"y": -0.481},
         "prefix"     : "User: "
       },
       {
@@ -41,13 +46,22 @@
       },
       {
         "type"       : "strings",
-        "dimensions" : {"x": 0.0, "y": -0.37},
+        "dimensions" : {"x": -0.49, "y": -0.222},
         "external"   : true,
         "resource"   : "resources",
         "node"       : "jobMetaData",
         "maxLines"   : 4,
-        "lineWidth"  : 23,
+        "lineWidth"  : 25,
         "delimiter"  : ": "
+      }
+    ],
+    [
+      {
+        "type"       : "panSprite",
+        "dimensions" : { "x": -0.5, "y": -0.5, "w" : 1.0, "h" : 1.0, 
+                         "displayW": 0.625 },
+        "sprite"    :  "event",
+        "period"    :  200
       }
     ]
   ]
