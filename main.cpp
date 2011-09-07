@@ -17,14 +17,12 @@
 #define WINDOW_TITLE "LHC@Home 2.0"
 
 
-#include <iostream>
 #include <cstdlib>
 #include <string>
 #include <fstream>
 
 using std::string;
 using std::ifstream;
-using std::cerr;
 using std::endl;
 
 //JsonCpp
@@ -45,6 +43,7 @@ using std::endl;
 #include "boincShare.h"
 #include "resources.h"
 #include "networking.h"
+#include "errors.h"
 
 //Global variables
 Share::SharedData* Share::data;
@@ -63,7 +62,7 @@ void updateConfiguration( CURL* indexHandle )
   // Or have we been given a forced config file at run time?
   if (forcedConfigFile != "")
   {
-    cerr << "Using forced config file: " << forcedConfigFile << endl;
+    Errors::err << "Using forced config file: " << forcedConfigFile << endl;
     indexFilename = forcedConfigFile;
   }
   else
@@ -75,8 +74,8 @@ void updateConfiguration( CURL* indexHandle )
 
   if (!jsonFile)
   {
-    cerr << "Config file " << indexFilename << " not found." << endl;
-    boinc_close_window_and_quit("Aborting...");
+    Errors::err << "Config file " << indexFilename << " not found." << endl
+         << Errors::fatal;
   }
 
 
@@ -86,9 +85,8 @@ void updateConfiguration( CURL* indexHandle )
   bool parsingSuccessful = reader.parse(jsonFile, newConfig);
   if (!parsingSuccessful)
   {
-    cerr << "Provided JSON file" << indexFilename 
-         << "is invalid JSON." << endl;
-    boinc_close_window_and_quit("Aborting...");
+    Errors::err << "Provided JSON file" << indexFilename 
+         << "is invalid JSON." << endl << Errors::fatal;
   }
 
   // Is this a new configuration or simply an update to the current one?
@@ -151,8 +149,7 @@ void updateConfiguration( CURL* indexHandle )
         updatePeriod = newConfig["settings"]["refresh"].asDouble(); //Global
       else
       {
-        cerr << "Nonsense refresh time" << endl;
-        boinc_close_window_and_quit( "Aborting..." );
+        Errors::err << "Nonsense refresh time" << endl << Errors::fatal;
       }
     }
 

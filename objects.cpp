@@ -3,7 +3,6 @@
 #include <iostream>
 #include <cstdio>
 
-using std::cerr;
 using std::endl;
 using std::string;
 using std::stringstream;
@@ -15,6 +14,7 @@ using std::stringstream;
 
 //Our things
 #include "graphics.h"
+#include "errors.h"
 #include "objects.h"
 #include "boincShare.h"
 #include "resources.h"
@@ -135,8 +135,8 @@ void Objects::Object::autoDimensions(Sprite* sprite)
   if ( (self_w == 0) and (self_h == 0) )
   {
     string objectType = self_data["type"].asString();
-    cerr << "No dimensions given for " << objectType << endl;
-    boinc_close_window_and_quit("Aborting...\n");
+    Errors::err << "No dimensions given for " << objectType << endl 
+                << Errors::fatal;
   }
 
   // If a dimension is missing, extract it from the aspect ratio
@@ -171,9 +171,9 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
     //we pretend it was meant to and complain
     if (dimensions != "fullscreen")
     {
-      cerr << "ERROR: Slideshow - provided dimensions as string, but does"
-           << "not want fullscreen, interpretting as fullscreen anyway."
-           << endl;
+      Errors::err << "ERROR: Slideshow - provided dimensions as string, "
+                  << "but does not want fullscreen, interpretting as "
+                  << "fullscreen anyway." << endl;
     }
 
     self_x = -0.5f;
@@ -427,8 +427,8 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   if (dimensions["displayW"].isNull() == dimensions["displayH"].isNull() )
   {
-    cerr << "Both/neither of 'displayW' and 'displayH' are set." << endl;
-    boinc_close_window_and_quit("Aborting...");
+    Errors::err << "Both/neither of 'displayW' and 'displayH' are set." 
+                << endl << Errors::fatal;
   }
 
   self_w = dimensions["w"].asDouble();
@@ -449,7 +449,7 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   if ( data["period"].isNull() )
   {
-    cerr << "PanSprite period is NULL, but required." << endl;
+    Errors::err << "PanSprite period is NULL, but required." << endl;
   }
 
   self_panPeriod    = data["period"].asInt();

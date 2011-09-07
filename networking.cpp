@@ -6,12 +6,12 @@
 
 //Ours
 #include "networking.h"
+#include "errors.h"
 
 // Standard
 #include <string>
 #include <iostream>
 using std::string;
-using std::cerr;
 using std::endl;
 
 Networking::FileDownloader* Networking::fileDownloader;
@@ -72,8 +72,8 @@ string Networking::FileDownloader::getFile(string filename)
 
     if (result != CURLE_OK) 
     {
-      cerr << "CURL Error in getting file \"" << filename << "\" - "
-           << curl_easy_strerror(result) << endl;
+      Errors::err << "CURL Error in getting file \"" << filename << "\" - "
+                  << curl_easy_strerror(result) << endl;
       throw result;
     }
 
@@ -109,7 +109,8 @@ long Networking::FileDownloader::getFileAge( string filename )
     curl_easy_getinfo(easyHandle, CURLINFO_FILETIME, &age);
 
     if (age == -1)
-      cerr << "ERROR - the server does not support file ages." << endl;
+      Errors::err << "ERROR - the server does not support file ages." 
+                  << endl;
 
     return age;
   }
@@ -213,8 +214,9 @@ void Networking::FileDownloader::process()
         Networking::FileInformation completedFile = 
                                                  self_fileInfos[easyHandle];
         //Report the success
-        cerr << "Successful download of file \"" << completedFile.filePath
-             << "\"" << endl;
+        Errors::err << "Successful download of file \"" 
+                    << completedFile.filePath
+                    << "\"" << endl;
 
         //Close file and run the finish function (if it exists)
         fclose(completedFile . filep);
@@ -236,8 +238,9 @@ void Networking::FileDownloader::process()
                                                  self_fileInfos[easyHandle];
         string errorDescription = curl_easy_strerror(result);
 
-        cerr << "Unhandled error downloading \"" << completedFile.filePath 
-             << "\" - " << errorDescription<< endl;
+        Errors::err << "Unhandled error downloading \"" 
+                    << completedFile.filePath 
+                    << "\" - " << errorDescription<< endl;
       }
     }
   }

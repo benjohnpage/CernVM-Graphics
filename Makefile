@@ -1,5 +1,5 @@
 #BOINC settings - change BOINC_DIR to your liking
-BOINC_DIR = ../../
+BOINC_DIR = ../..
 BOINC_API_DIR = $(BOINC_DIR)/api
 BOINC_LIB_DIR = $(BOINC_DIR)/lib
 
@@ -38,27 +38,39 @@ networking.o: networking.cpp
 
 resources.o: resources.cpp 
 	g++ -c $(CXXFLAGS) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o resources.o resources.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o resources.o resources.cpp
 
 objects.o: objects.cpp 
 	g++ -c $(CXXFLAGS) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o objects.o objects.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o objects.o objects.cpp
 
 sprites.o: sprites.cpp 
 	g++ -c $(CXXFLAGS) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o sprites.o sprites.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o sprites.o sprites.cpp
 
 graphics.o: graphics.cpp 
 	g++ -c $(CXXFLAGS) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o graphics.o graphics.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o graphics.o graphics.cpp
+
+errors.o: errors.cpp 
+	g++ -c $(CXXFLAGS) \
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o errors.o errors.cpp
 
 main.o: main.cpp 
 	g++ -c $(CXXFLAGS) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o main.o main.cpp 
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o main.o main.cpp 
 
-screensaver: main.o graphics.o sprites.o objects.o resources.o networking.o $(BOINC_LIB_DIR)/libboinc.a $(BOINC_API_DIR)/libboinc_graphics2.a JsonCpp/libs/*
+screensaver: main.o graphics.o sprites.o objects.o resources.o networking.o errors.o $(BOINC_LIB_DIR)/libboinc.a $(BOINC_API_DIR)/libboinc_graphics2.a JsonCpp/libs/*
 	g++ $(CXXFLAGS) -o screensaver  \
-	main.o graphics.o objects.o resources.o sprites.o networking.o -pthread \
+	main.o graphics.o objects.o resources.o sprites.o networking.o \
+        errors.o \
+        -pthread \
 	$(BOINC_API_DIR)/libboinc_graphics2.a \
 	$(BOINC_API_DIR)/libboinc_api.a \
 	$(BOINC_LIB_DIR)/libboinc.a \

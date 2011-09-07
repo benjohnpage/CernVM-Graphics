@@ -62,6 +62,11 @@ target cernvmwrapper_graphics_x86_64.o: MACOSX_DEPLOYMENT_TARGET=10.5
 JsonCpp/libs/*:
 	cd JsonCpp; python scons.py platform=linux-gcc
 
+errors_x86_64.o: errors.cpp 
+	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o errors_x86_64.o errors.cpp
+
 networking_x86_64.o: networking.cpp 
 	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
 	-I$(BOINC_LIB_DIR) \
@@ -69,27 +74,36 @@ networking_x86_64.o: networking.cpp
 
 resources_x86_64.o: resources.cpp 
 	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o resources_x86_64.o resources.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o resources_x86_64.o resources.cpp
 
 objects_x86_64.o: objects.cpp 
 	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o objects_x86_64.o objects.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o objects_x86_64.o objects.cpp
 
 sprites_x86_64.o: sprites.cpp 
 	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o sprites_x86_64.o sprites.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o sprites_x86_64.o sprites.cpp
 
 graphics_x86_64.o: graphics.cpp 
 	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -I$(PNG_LIBS) -o graphics_x86_64.o graphics.cpp
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -I$(PNG_LIBS) \
+        -o graphics_x86_64.o graphics.cpp
 
 main_x86_64.o: main.cpp 
 	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
-	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) -o main_x86_64.o main.cpp 
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
+        -o main_x86_64.o main.cpp 
 
-cernvmwrapper_graphics_x86_64: main_x86_64.o graphics_x86_64.o sprites_x86_64.o objects_x86_64.o resources_x86_64.o networking_x86_64.o $(BOINC_BUILD_DIR)/libboinc.a $(BOINC_BUILD_DIR)/libboinc_graphics2.a JsonCpp/libs/*
-	$(CXX_X86_64) $(CXXFLAGS_X86_64) $(LDFLAGS_X86_64) -o cernvmwrapper_graphics_x86_64 \
-	main_x86_64.o graphics_x86_64.o objects_x86_64.o resources_x86_64.o sprites_x86_64.o networking_x86_64.o -pthread \
+cernvmwrapper_graphics_x86_64: main_x86_64.o graphics_x86_64.o sprites_x86_64.o objects_x86_64.o resources_x86_64.o networking_x86_64.o errors_x86_64.o $(BOINC_BUILD_DIR)/libboinc.a $(BOINC_BUILD_DIR)/libboinc_graphics2.a JsonCpp/libs/*
+	$(CXX_X86_64) $(CXXFLAGS_X86_64) $(LDFLAGS_X86_64) \
+        -o cernvmwrapper_graphics_x86_64 \
+	main_x86_64.o graphics_x86_64.o objects_x86_64.o \
+        resources_x86_64.o sprites_x86_64.o networking_x86_64.o \
+        errors_x86_64.o \
+        -pthread \
 	$(BOINC_BUILD_DIR)/libboinc_graphics2.a \
 	$(BOINC_BUILD_DIR)/libboinc_api.a \
 	$(BOINC_BUILD_DIR)/libboinc.a \

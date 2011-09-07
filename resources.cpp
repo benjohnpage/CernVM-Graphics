@@ -2,6 +2,7 @@
 #include "resources.h"
 #include "boincShare.h"
 #include "networking.h"
+#include "errors.h"
 
 //Json
 #include "json/json.h"
@@ -12,11 +13,13 @@
 //Std
 #include <string>
 #include <fstream>
+#include <iostream>
 #include <map>
 
 using std::string;
 using std::ifstream;
 using std::map;
+using std::endl;
 
 Resources::ResourcesMap Resources::resourcesMap;
 
@@ -49,8 +52,8 @@ Resources::ResourcesMap Resources::loadResources( Json::Value resources )
     bool parsingSuccessful = reader.parse( resourceFile, resource );
     if (!parsingSuccessful)
     {
-      fprintf(stderr, "Provided JSON file is invalid JSON.\n");
-      boinc_close_window_and_quit("Aborting...");
+      Errors::err << "Provided JSON file is invalid JSON." << endl 
+           << Errors::fatal;
     }
 
     // Save in memory

@@ -10,6 +10,7 @@
 #include "boincShare.h"
 #include "networking.h"
 #include "resources.h"
+#include "errors.h"
 
 //JsonCPP
 #include "json/json.h"
@@ -25,7 +26,6 @@
 #include <sstream>
 #include <stdexcept>
 
-using std::cerr;
 using std::endl;
 using std::map;
 using std::stringstream;
@@ -45,8 +45,8 @@ Graphics::Sprite* Graphics::getSprite(string groupName, string spriteName)
                                           Graphics::sprites.find(groupName);
   if (groupItr == Graphics::sprites.end())
   {
-    cerr << "The requested group \"" << groupName 
-         << "\" does not exist" << endl;
+    Errors::err << "The requested group \"" << groupName 
+                << "\" does not exist" << endl;
     throw out_of_range("Unknown group"); 
   }
 
@@ -54,8 +54,9 @@ Graphics::Sprite* Graphics::getSprite(string groupName, string spriteName)
                                              -> second . find(spriteName);
   if (spriteItr == groupItr -> second.end())
   {
-    cerr << "The requested sprite \"" << spriteName << "\", in group \"" 
-         << groupName <<"\" does not exist." << endl;
+    Errors::err << "The requested sprite \"" << spriteName 
+                << "\", in group \"" << groupName << "\" does not exist." 
+                << endl;
     throw out_of_range("Unknown sprite in group"); 
   }
   return spriteItr->second;
@@ -83,7 +84,7 @@ Graphics::Sprite::Sprite()
 
 Graphics::Sprite::Sprite(string filename)
 {
-  cerr << "Creating sprite from " << filename << endl;
+  Errors::err << "Creating sprite from " << filename << "\n";
   int width, height;
   bool hasAlpha;
   GLubyte* texturePointer;
@@ -344,8 +345,7 @@ void Graphics::loadSprites(Json::Value sprites)
       }
       catch (const char* msg)
       {
-        cerr << msg << endl;
-        boinc_close_window_and_quit("Aborted.");
+        Errors::err << msg << endl << Errors::fatal;
       }
       
       //Add sprite to group it's respective group with appropriate name
