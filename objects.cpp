@@ -50,7 +50,9 @@ void Objects::loadObjects( Json::Value objects )
       Objects::Object * newObj;
       Json::Value objectData = viewObjects[n];
   
-      //Call correct construtor
+      // Call correct construtor
+      // (NB These will be scattered around different headers because a
+      // single header will become too long.)
       if (objectData["type"] == "boincValue")
         newObj = new Objects::BoincValue(objectData);
       if (objectData["type"] == "strings")
@@ -63,6 +65,8 @@ void Objects::loadObjects( Json::Value objects )
         newObj = new Objects::SpriteDisplay(objectData);
       if (objectData["type"] == "panSprite")
         newObj = new Objects::PanSprite(objectData);
+      if (objectData["type"] == "errorDisplay")
+        newObj = new Objects::ErrorDisplay(objectData);
   
       view . push_back( newObj );
     }

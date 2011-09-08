@@ -8,8 +8,8 @@ using std::ostream;
 using std::stringstream;
 using std::string;
 
-// The real aim here is to produce a cerr replacement that both outputs to
-// cerr, and captures the errors so that we can display them graphically.
+#include "json/json.h"
+#include "objects.h"
 
 namespace Errors
 {
@@ -44,6 +44,16 @@ namespace Errors
 
   extern StreamFork err;
   extern stringstream errorStream;
+};
+
+namespace Objects
+{
+  class ErrorDisplay : public Object
+  {
+    public:
+      ErrorDisplay( Json::Value data );
+      void render();
+  };
 };
 
 #endif
