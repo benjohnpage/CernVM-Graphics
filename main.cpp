@@ -34,6 +34,7 @@ using std::endl;
 //BOINC
 #include "graphics2.h"
 #include "diagnostics.h"
+#include "boinc_api.h"
 #include "boinc_gl.h" //This handles multiplatform openGL stuff
 #include "txf_util.h"
 
@@ -164,10 +165,16 @@ void updateConfiguration( CURL* indexHandle )
 
 void app_graphics_render(int xs, int ys, double timestamp)
 {
+  //Boinc Shared Memory
+
+  if ( Share::data == NULL )
+    Share::data = (Share::SharedData*) boinc_graphics_get_shmem( "cernvm" );
+  else 
+    Share::data -> countdown = 5;
+
+
+
   //CURL Downloading 
-  //XXX it has to be here as I have no other loop to put it in. However it
-  //does mean that the downloading will be counted amongst the graphics
-  //throttling.
   Networking::fileDownloader -> process();
 
   //Update every "updatePeriod" seconds (this also does the initial download
@@ -216,12 +223,6 @@ void app_graphics_init()
 {
 
   //Initialises the resources for the application.
-
-  //FIXME - get from boinc
-  Share::data = new Share::SharedData;
-  Share::data->credit = -1337.1;
-  Share::data->username = "NOT IMPLEMENTED";
-  Share::data->sharedFolder = "../boincShare"; 
 
   char fontFolder[] = ".";
   txf_load_fonts(fontFolder);
@@ -290,10 +291,10 @@ int main( int argc, char** argv)
     if (potentialConfigFile.substr(0,9) == "--config=")
       forcedConfigFile = potentialConfigFile.substr(9);
   }
+
   boinc_init_graphics_diagnostics(BOINC_DIAG_DEFAULTS);
 
-  //There are other functions here in the example, but I'm not sure
-  //what they do.
+  boinc_parse_init_data_file();
 
   boinc_graphics_loop(argc, argv, WINDOW_TITLE);
 

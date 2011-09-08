@@ -232,10 +232,18 @@ void Objects::BoincValue::render()
 
   stringstream output;
   output << self_prefix;
-  if (self_type == "username")
-    output << Share::data->username;
-  if (self_type == "credit")
-    output << Share::data->credit;
+
+  if (Share::data == NULL)
+  {
+    output << "NO SHMEM";
+  }
+  else
+  {
+    if (self_type == "username")
+      output << Share::data -> init_data . user_name;
+    if (self_type == "credit")
+      output << Share::data -> init_data . user_total_credit;
+  }
 
   if (self_coordType == Objects::NORM)
     Graphics::drawText(output.str(), self_x, self_y);
