@@ -33,7 +33,7 @@ JsonCpp/libs/*:
 
 networking.o: networking.cpp 
 	g++ -c $(CXXFLAGS) \
-	-I$(BOINC_LIB_DIR) \
+	$(BOINC_INCLUDE_DIRS) -I$(JSONCPP_INC_DIR) \
 	-o networking.o networking.cpp
 
 resources.o: resources.cpp 
