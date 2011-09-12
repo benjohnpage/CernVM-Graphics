@@ -68,6 +68,8 @@ void Objects::loadObjects( Json::Value objects )
         newObj = new Objects::PanSprite(objectData);
       if (objectData["type"] == "errorDisplay")
         newObj = new Objects::ErrorDisplay(objectData);
+      if (objectData["type"] == "debugDisplay")
+        newObj = new Objects::DebugDisplay(objectData);
   
       view . push_back( newObj );
     }
@@ -141,7 +143,8 @@ void Objects::Object::autoDimensions(Sprite* sprite)
   {
     string objectType = self_data["type"].asString();
     Errors::err << "No dimensions given for " << objectType << endl 
-                << Errors::fatal;
+                << "Attempting zero dimensions." << endl;
+    return;
   }
 
   // If a dimension is missing, extract it from the aspect ratio
@@ -438,14 +441,17 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   Json::Value dimensions = data["dimensions"];
 
-  if (dimensions["displayW"].isNull() == dimensions["displayH"].isNull() )
-  {
-    Errors::err << "Both/neither of 'displayW' and 'displayH' are set." 
-                << endl << Errors::fatal;
-  }
 
   self_w = dimensions["w"].asDouble();
   self_h = dimensions["h"].asDouble();
+
+  if (dimensions["displayW"].isNull() == dimensions["displayH"].isNull() )
+  {
+    Errors::err << "Both/neither of 'displayW' and 'displayH' are set." 
+                << endl
+                << "Setting displayW to dimensions[w]" << endl;
+    dimensions["displayW"] = dimensions["w"].asDouble();
+  }
 
   if ( !dimensions["displayW"].isNull() )
   {
@@ -460,12 +466,15 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   self_panDirection = FORWARDS;
 
+  self_panPeriod    = data["period"].asInt();
+
   if ( data["period"].isNull() )
   {
-    Errors::err << "PanSprite period is NULL, but required." << endl;
+    Errors::err << "PanSprite period is NULL, but required." << endl
+                << "Setting period to 100 frames" << endl;
+    self_panPeriod = 100;
   }
 
-  self_panPeriod    = data["period"].asInt();
 }
 
 void Objects::PanSprite::render()

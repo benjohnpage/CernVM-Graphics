@@ -49,7 +49,7 @@ Graphics::Sprite* Graphics::getSprite(string groupName, string spriteName)
   {
     Errors::err << "The requested group \"" << groupName 
                 << "\" does not exist" << endl;
-    throw out_of_range("Unknown group"); 
+    return NULL;
   }
 
   Graphics::spriteGroup::iterator spriteItr = groupItr 
@@ -59,7 +59,7 @@ Graphics::Sprite* Graphics::getSprite(string groupName, string spriteName)
     Errors::err << "The requested sprite \"" << spriteName 
                 << "\", in group \"" << groupName << "\" does not exist." 
                 << endl;
-    throw out_of_range("Unknown sprite in group"); 
+    return NULL;
   }
   return spriteItr->second;
 }
@@ -86,7 +86,7 @@ Graphics::Sprite::Sprite()
 
 Graphics::Sprite::Sprite(string filename)
 {
-  Errors::err << "Creating sprite from " << filename << "\n";
+  Errors::dbg << "Creating sprite from " << filename << "\n";
   int width, height;
   bool hasAlpha;
   GLubyte* texturePointer;
@@ -101,14 +101,15 @@ Graphics::Sprite::Sprite(string filename)
     successfulLoad = Graphics::loadPng(filename, width, height, hasAlpha,
                                        &texturePointer);
   else 
-    errorMessage = "File type \"" + fileExtension + "\" not supported.\n";
+    Errors::err << "File type \"" << fileExtension 
+                << "\" not supported." << endl;
 
 
   if (!successfulLoad)
   {
-    errorMessage += "Unable to load texture file.\n";
-    errorMessage += "Filename: " + filename + "\n";
-    throw errorMessage.c_str();
+    Errors::err << "Unable to load texture file." << endl;
+    Errors::err << "Filename: " << filename << endl;
+    return;
   }
 
   //Set up normal parameters
@@ -340,18 +341,11 @@ void Graphics::loadSprites(Json::Value sprites)
 
       //Try to create a new sprite
       //NOTE - Sprites are loaded with no thought to their lifetime
-      Graphics::Sprite* newSprite;
-      try
-      {
-        newSprite = new Graphics::Sprite( localFilename );
-      }
-      catch (const char* msg)
-      {
-        Errors::err << msg << endl << Errors::fatal;
-      }
+      Graphics::Sprite* newSprite = new Graphics::Sprite( localFilename );
       
       //Add sprite to group it's respective group with appropriate name
-      Graphics::sprites[groupName][internalName] = newSprite;
+      Graphics::sprites[ groupName ][ internalName ] = newSprite;
+
       }
   }
 }

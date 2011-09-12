@@ -214,7 +214,7 @@ void Networking::FileDownloader::process()
         Networking::FileInformation completedFile = 
                                                  self_fileInfos[easyHandle];
         //Report the success
-        Errors::err << "Successful download of file \"" 
+        Errors::dbg << "Successful download of file \"" 
                     << completedFile.filePath
                     << "\"" << endl;
 

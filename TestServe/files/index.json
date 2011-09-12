@@ -69,6 +69,12 @@
         "type"       : "errorDisplay",
         "dimensions" : { "x" : -0.49, "y" : 0.45}
       }
+    ],
+    [
+      {
+        "type"       : "debugDisplay",
+        "dimensions" : { "x" : -0.49, "y" : 0.45}
+      }
     ]
   ]
 }

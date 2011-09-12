@@ -10,8 +10,6 @@
 
 namespace Errors
 {
-  std::ostream& fatal(std::ostream& out);
-
   class StreamFork
   {
     std::ostream& self_a;
@@ -39,8 +37,15 @@ namespace Errors
       }
   };
 
+  std::ostream& fatal(std::ostream& out);
+
+  // Messaging streams
   extern StreamFork err;
   extern std::stringstream errorStream;
+  extern std::stringstream dbg; // Debug info
+
+  // Utility functions
+  std::string reverseByDelim( std::string reverseMe, char delimiter );
 };
 
 namespace Objects
@@ -49,6 +54,13 @@ namespace Objects
   {
     public:
       ErrorDisplay( Json::Value data );
+      void render();
+  };
+
+  class DebugDisplay : public Object
+  {
+    public:
+      DebugDisplay( Json::Value data );
       void render();
   };
 };

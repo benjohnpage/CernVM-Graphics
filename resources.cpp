@@ -52,8 +52,10 @@ Resources::ResourcesMap Resources::loadResources( Json::Value resources )
     bool parsingSuccessful = reader.parse( resourceFile, resource );
     if (!parsingSuccessful)
     {
-      Errors::err << "Provided JSON file is invalid JSON." << endl 
-           << Errors::fatal;
+      Errors::err << "Provided JSON file " << localFilename
+                  << "is invalid JSON." << endl 
+                  << resourceName << " will not be loaded." << endl;
+      continue;
     }
 
     // Save in memory

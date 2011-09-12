@@ -63,7 +63,7 @@ void updateConfiguration( CURL* indexHandle )
   // Or have we been given a forced config file at run time?
   if (forcedConfigFile != "")
   {
-    Errors::err << "Using forced config file: " << forcedConfigFile << endl;
+    Errors::dbg << "Using forced config file: " << forcedConfigFile << endl;
     indexFilename = forcedConfigFile;
   }
   else
@@ -76,7 +76,8 @@ void updateConfiguration( CURL* indexHandle )
   if (!jsonFile)
   {
     Errors::err << "Config file " << indexFilename << " not found." << endl
-         << Errors::fatal;
+                << "Keeping previous configuration";
+    return;
   }
 
 
@@ -87,7 +88,9 @@ void updateConfiguration( CURL* indexHandle )
   if (!parsingSuccessful)
   {
     Errors::err << "Provided JSON file" << indexFilename 
-         << "is invalid JSON." << endl << Errors::fatal;
+                << "is invalid JSON."   << endl
+                << "Keeping old configuration" << endl;
+    return;
   }
 
   // Is this a new configuration or simply an update to the current one?
@@ -150,7 +153,10 @@ void updateConfiguration( CURL* indexHandle )
         updatePeriod = newConfig["settings"]["refresh"].asDouble(); //Global
       else
       {
-        Errors::err << "Nonsense refresh time" << endl << Errors::fatal;
+        Errors::err << "Nonsense refresh time" << endl 
+                    << "Choosing to not refresh" << endl;
+
+        updatePeriod = 0;
       }
     }
 
