@@ -4,8 +4,6 @@
 #include <cstdio>
 #include <string>
 #include <map>
-using std::string;
-using std::map;
 
 #include <curl/curl.h>
 
@@ -16,14 +14,14 @@ namespace Networking
 
   struct FileInformation
   {
-    string filePath;
+    std::string filePath;
     responseFunc finishResponse;
     FILE* filep;
     time_t modTime;
     FileInformation();
   };
 
-  typedef map< CURL*, FileInformation > FileInfoMap ;
+  typedef std::map< CURL*, FileInformation > FileInfoMap ;
 
   //The class for file downloading
   //
@@ -35,24 +33,24 @@ namespace Networking
   class FileDownloader
   {
     private:
-      string self_defaultServerAddress;
+      std::string self_defaultServerAddress;
       int    self_numActive;
       CURLM* self_multiHandle;
 
       FileInfoMap self_fileInfos;
     public:
-      FileDownloader( string defaultServerAddress );
+      FileDownloader( std::string defaultServerAddress );
       void   process       ();
-      void   addFile       ( string filename, FileInformation fileInfo);
-      long   getFileAge    ( string filename );
-      string getFile       ( string filename );
-      string pathFromString( string path );
-      bool   isInQueue( string filePath );
+      void   addFile       ( std::string filename, FileInformation fileInfo);
+      long   getFileAge    ( std::string filename );
+      std::string getFile       ( std::string filename );
+      std::string pathFromString( std::string path );
+      bool   isInQueue( std::string filePath );
   };
 
   extern FileDownloader* fileDownloader;
 
-  time_t fileModifyTime( string localPath );
+  time_t fileModifyTime( std::string localPath );
 };
 
 #endif //Include guard

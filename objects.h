@@ -12,11 +12,6 @@
 #include <vector>
 #include <map>
 
-using std::string;
-using std::vector;
-using std::map;
-using Graphics::Sprite;
-
 namespace Objects
 {
   void loadObjects(Json::Value objects);
@@ -37,7 +32,7 @@ namespace Objects
 
       double    self_w;
       double    self_h;
-      void      autoDimensions(Sprite* sprite);
+      void      autoDimensions(Graphics::Sprite* sprite);
   };
 
   class BoincValue: public Object
@@ -46,8 +41,8 @@ namespace Objects
       BoincValue(Json::Value data);
       void render();
     private:
-      string self_type;
-      string self_prefix;
+      std::string self_type;
+      std::string self_prefix;
   };
 
   class StringDisplay: public Object
@@ -56,8 +51,8 @@ namespace Objects
       StringDisplay(Json::Value data);
       void render();
     private:
-      vector<string> self_displayStrings;
-      string         self_delimiter;
+      std::vector<std::string> self_displayStrings;
+      std::string         self_delimiter;
       int            self_maxLines;
       int            self_lineWidth;
   };
@@ -68,7 +63,7 @@ namespace Objects
       SpriteDisplay(Json::Value data);
       void render();
     private:
-      string self_spriteName;
+      std::string self_spriteName;
   };
 
   class Slideshow: public Object
@@ -80,7 +75,7 @@ namespace Objects
       int self_time;
       int self_timeout;
       
-      string self_spriteGroup;
+      std::string self_spriteGroup;
       Graphics::spriteGroup::iterator self_spriteIter;
   };
 
@@ -96,7 +91,7 @@ namespace Objects
       int self_time;
       int self_timeout;
       
-      string self_spriteGroup;
+      std::string self_spriteGroup;
       Graphics::spriteGroup::iterator self_spriteIter;
   };
 
@@ -106,7 +101,7 @@ namespace Objects
       PanSprite(Json::Value data);
       void render();
     private:
-      string self_sprite;
+      std::string self_sprite;
 
       int self_panTime;
       int self_panPeriod;
@@ -121,8 +116,8 @@ namespace Objects
       double self_displayDim;
   };
 
-  typedef vector< Objects::Object* >    View;
-  typedef vector< Objects::View > ViewList;
+  typedef std::vector< Objects::Object* >    View;
+  typedef std::vector< Objects::View > ViewList;
   extern ViewList viewList;
   extern View*    activeView;
 };

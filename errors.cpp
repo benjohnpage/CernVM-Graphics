@@ -11,8 +11,12 @@
 //std
 #include <iostream>
 #include <sstream>
+#include <cstdio>
 using std::ostream;
 using std::cerr;
+using std::stringstream;
+using std::string;
+using std::getline;
 
 
 stringstream Errors::errorStream("");
@@ -35,11 +39,18 @@ void Objects::ErrorDisplay::render()
   // but principles of YNGNI suggest that someone should cross that bridge
   // when they come to it.
 
-  string displayText = Errors::errorStream.str();
+  stringstream displayStream( Errors::errorStream.str() );
+  string displayText;
+  while (displayStream)
+  {
+    string line;
+    getline(displayStream, line, '\n');
+    displayText = line + '\n' + displayText;
+  }
 
   if (self_coordType == Objects::NON_NORM)
     Graphics::drawText( displayText, (int)self_x, (int)self_y );
 
   if (self_coordType == Objects::NORM)
-    Graphics::drawText( displayText, self_x, self_y );
+    Graphics::drawText( displayText, self_x, self_y);
 }

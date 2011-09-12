@@ -8,20 +8,17 @@
 #include <string>
 #include <map>
 
-using std::string;
-using std::map;
-
 //OpenGL
 #include "boinc_gl.h"
 
 //The main namespace
 namespace Graphics
 {
-  void drawText( string text, int x, int y, float* colour = NULL );
-  void drawText( string text, double xFrac, double yFrac, 
+  void drawText( std::string text, int x, int y, float* colour = NULL );
+  void drawText( std::string text, double xFrac, double yFrac, 
                  float* colour = NULL );
 
-  bool loadPng(string filename, int& outWidth, int& outHeight, 
+  bool loadPng(std::string filename, int& outWidth, int& outHeight, 
                bool& outHasAlpha, GLubyte** outData);
   
   void drawableWindow( int& windowW, int& windowH );
@@ -51,7 +48,7 @@ namespace Graphics
       Sprite();
       ~Sprite();
   
-      Sprite(string filename);
+      Sprite(std::string filename);
       
       void blit( int    xScr, int    yScr, int    wScr, int    hScr,
                  double xTex, double yTex, double wTex, double hTex );
@@ -65,16 +62,16 @@ namespace Graphics
       double aspectRatio(); //Width to height
   };
 
-  typedef map<string, Sprite*>     spriteGroup;
-  typedef map<string, spriteGroup> spriteGroupMap;
+  typedef std::map<std::string, Sprite*>     spriteGroup;
+  typedef std::map<std::string, spriteGroup> spriteGroupMap;
 
   //Globals
   extern spriteGroupMap sprites;
 
   void loadSprites(Json::Value);
   void removeSprites();
-  Sprite* getSprite(string spriteName);
-  Sprite* getSprite(string groupName, string spriteName);
+  Sprite* getSprite(std::string spriteName);
+  Sprite* getSprite(std::string groupName, std::string spriteName);
   
 }
 

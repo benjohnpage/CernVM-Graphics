@@ -2,7 +2,8 @@
 
 #include <cstdio>
 #include <sstream>
-
+#include <string>
+using std::string;
 using std::stringstream;
 
 //LibPNG

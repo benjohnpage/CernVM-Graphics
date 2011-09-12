@@ -18,6 +18,7 @@ using std::stringstream;
 #include "objects.h"
 #include "boincShare.h"
 #include "resources.h"
+using Graphics::Sprite;
 
 
 Objects::ViewList Objects::viewList;

@@ -4,24 +4,21 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-using std::ostream;
-using std::stringstream;
-using std::string;
 
 #include "json/json.h"
 #include "objects.h"
 
 namespace Errors
 {
-  ostream& fatal(ostream& out);
+  std::ostream& fatal(std::ostream& out);
 
   class StreamFork
   {
-    ostream& self_a;
-    ostream& self_b;
+    std::ostream& self_a;
+    std::ostream& self_b;
 
     public:
-      StreamFork(ostream& a, ostream& b )
+      StreamFork(std::ostream& a, std::ostream& b )
         : self_a ( a ), self_b ( b )
       {
       }
@@ -34,7 +31,7 @@ namespace Errors
         return *this;
       }
 
-      StreamFork& operator<< ( ostream& manipFunc( ostream& ) )
+      StreamFork& operator<< ( std::ostream& manipFunc( std::ostream& ) )
       {
         self_a << manipFunc;
         self_b << manipFunc;
@@ -43,7 +40,7 @@ namespace Errors
   };
 
   extern StreamFork err;
-  extern stringstream errorStream;
+  extern std::stringstream errorStream;
 };
 
 namespace Objects

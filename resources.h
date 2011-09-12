@@ -4,16 +4,13 @@
 #include <string>
 #include <map>
 
-using std::string;
-using std::map;
-
 #include "json/json.h"
 
 namespace Resources
 {
-  typedef map<string, Json::Value> ResourcesMap;
+  typedef std::map<std::string, Json::Value> ResourcesMap;
   extern ResourcesMap resourcesMap;
-  Json::Value getResourceNode(string resourceName, string node);
+  Json::Value getResourceNode(std::string resourceName, std::string node);
   
   ResourcesMap loadResources(Json::Value resources);
 };

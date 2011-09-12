@@ -25,11 +25,13 @@
 #include <cstdlib>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 using std::endl;
 using std::map;
 using std::stringstream;
 using std::out_of_range;
+using std::string;
 
 Graphics::spriteGroupMap Graphics::sprites;
 
