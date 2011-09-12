@@ -21,8 +21,13 @@ using std::getline;
 
 // Messaging streams
 stringstream Errors::errorStream("");
+stringstream Errors::debugStream("");
 Errors::StreamFork Errors::err(std::cerr, errorStream);
-stringstream Errors::dbg;
+Errors::StreamFork Errors::dbg(std::cerr, debugStream);;
+
+// Messaging views
+Objects::View Objects::errorView;
+Objects::View Objects::debugView;
 
 ostream& Errors::fatal(ostream& out)
 {
@@ -77,7 +82,7 @@ void Objects::DebugDisplay::render()
   // when they come to it.
 
   string displayText;
-  displayText = Errors::reverseByDelim( Errors::dbg.str(), '\n' );
+  displayText = Errors::reverseByDelim( Errors::debugStream.str(), '\n' );
 
   if (self_coordType == Objects::NON_NORM)
     Graphics::drawText( displayText, (int)self_x, (int)self_y );

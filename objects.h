@@ -92,7 +92,7 @@ namespace Objects
       int self_timeout;
       
       std::string self_spriteGroup;
-      Graphics::spriteGroup::iterator self_spriteIter;
+      size_t self_slidePos;
   };
 
   class PanSprite : public  Object
@@ -116,8 +116,8 @@ namespace Objects
       double self_displayDim;
   };
 
-  typedef std::vector< Objects::Object* >    View;
-  typedef std::vector< Objects::View > ViewList;
+  typedef std::vector< Objects::Object* > View;
+  typedef std::vector< Objects::View >    ViewList;
   extern ViewList viewList;
   extern View*    activeView;
 };

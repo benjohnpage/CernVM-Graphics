@@ -1,7 +1,9 @@
+// Standard
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <cstdio>
+#include <iterator>
 
 using std::endl;
 using std::string;
@@ -365,12 +367,11 @@ Objects::Gridshow::Gridshow(Json::Value data) :
 {
   self_spriteGroup = data["sprites"].asString();
 
-  //We start the drawing with the first sprite in the group
-  self_spriteIter = Graphics::sprites[self_spriteGroup].begin() ;
-
   Json::Value dimensions = data["dimensions"];
 
-  autoDimensions( self_spriteIter -> second );
+  autoDimensions( Graphics::sprites[ self_spriteGroup ].begin() -> second );
+
+  self_slidePos = 0;
 
   //Cell settings
   self_cellsWide  = dimensions["cellsWide"].asInt();
@@ -383,15 +384,39 @@ Objects::Gridshow::Gridshow(Json::Value data) :
 
 void Objects::Gridshow::render()
 {
+  using Graphics::Sprite;
+  using std::advance;
 
   int gridX = 0;
   int gridY = 0;
 
+  // A little protection ;)
+  if ( Graphics::sprites[self_spriteGroup].size() == 0 )
+  {
+    Errors::err << "Sprite group \"" << self_spriteGroup << "\" is empty."
+                << endl
+                << "Gridshow will not be rendered." << endl;
+    return;
+  }
+
+
   //Drawing loop - start at the current sprite
-  Graphics::spriteGroup::iterator drawIter = self_spriteIter;
+  Graphics::spriteGroup::iterator drawIter = 
+                                    Graphics::sprites[self_spriteGroup].begin();
+  advance( drawIter, self_slidePos * self_numCells );
+ 
   //We draw "self_numCells" sprites
   for (int i = 0; i < self_numCells; i++)
   {
+    Sprite* cellSprite = drawIter -> second;
+    if ( cellSprite == NULL )
+    {
+      Errors::err << "Trying to draw NULL sprite in Gridshow (index " << i
+                  << ")." << endl 
+                  << "Skipping cell." << endl;
+      continue;
+    }
+    
     if ( self_coordType == Objects::NON_NORM )
     {
       int cellX = self_x + gridX * self_w;
@@ -417,8 +442,8 @@ void Objects::Gridshow::render()
 
     //Do appropriate incriment of draw iterator (including looping).
     drawIter++;
-    if (drawIter == Graphics::sprites[self_spriteGroup].end())
-      drawIter = Graphics::sprites[self_spriteGroup].begin();
+    if ( drawIter == Graphics::sprites[self_spriteGroup] . end() )
+      break;
   }
 
   // Increment the timer
@@ -429,7 +454,11 @@ void Objects::Gridshow::render()
   // (Think about it for a second :) )
   if (self_time == self_timeout)
   {
-    self_spriteIter = drawIter;
+    self_slidePos++;
+    size_t groupSize = Graphics::sprites[self_spriteGroup].size();
+    if ( self_slidePos  * self_numCells > groupSize )
+      self_slidePos = 0;
+    
     self_time = 0;
   }
 }

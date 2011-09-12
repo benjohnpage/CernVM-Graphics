@@ -207,6 +207,14 @@ void app_graphics_render(int xs, int ys, double timestamp)
   /////////////////////////
   //    Rendering code   //
   /////////////////////////
+
+  if ( Objects::activeView == NULL )
+  {
+    Errors::err << "The active view is NULL" << endl
+                << "Not rendering" << endl;
+    return;
+  }
+
   Graphics::begin2D();
 
   //Black background
@@ -251,6 +259,17 @@ void app_graphics_init()
   Objects::activeView = & Objects::viewList[0];
   Objects::activeView -> push_back(new Objects::StringDisplay(stringData));
 
+  Json::Value errorDispData;
+  errorDispData["type"] = "errorDisplay";
+  errorDispData["dimensions"]["x"] = -0.49;
+  errorDispData["dimensions"]["y"] =  0.45;
+  Objects::errorView.push_back(new Objects::ErrorDisplay( errorDispData ));
+
+  Json::Value debugDispData;
+  debugDispData["type"] = "debugDisplay";
+  debugDispData["dimensions"]["x"] = -0.49;
+  debugDispData["dimensions"]["y"] =  0.45;
+  Objects::debugView.push_back(new Objects::DebugDisplay( debugDispData ));
 }
 
 
@@ -270,7 +289,11 @@ void boinc_app_key_press(int key, int)
   {
     boinc_close_window_and_quit("Escape Pressed");
   }
-  else if (key >=49 and key <= 58)
+  else if ( key == 100 )
+    Objects::activeView = &Objects::debugView;
+  else if ( key == 101 )
+    Objects::activeView = &Objects::errorView;
+  else if ( key >=49 and key <= 58 )
   {
     // viewNumber from 0 - 9, with 1 -> 0 and 0 -> 9 (key -> viewNumber)
     size_t viewNumber = key - 49;

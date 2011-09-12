@@ -93,7 +93,6 @@ Graphics::Sprite::Sprite(string filename)
 
   //Load the image
   bool successfulLoad = false;
-  string errorMessage = "";
   size_t fileExtensionPos = filename.find_last_of(".") + 1;
   string fileExtension = filename.substr(fileExtensionPos); 
 
@@ -107,7 +106,7 @@ Graphics::Sprite::Sprite(string filename)
 
   if (!successfulLoad)
   {
-    Errors::err << "Unable to load texture file." << endl;
+    Errors::err << "Error loading texture file." << endl;
     Errors::err << "Filename: " << filename << endl;
     return;
   }
@@ -251,6 +250,13 @@ void Graphics::Sprite::blit( int xScr, int yScr, int wScr, int hScr,
                               double xTex, double yTex, double wTex,
                                                         double hTex )
 {
+  if ( self_textureTarget == 0 )
+  {
+    Errors::err << "Error in blitting routine, the target texture is 0."
+               << endl
+               << "Skipping the blit";
+    return;
+  }
   glBindTexture(self_textureTarget, self_texture);
 
   //Make sure that we're in the right setup
@@ -342,6 +348,9 @@ void Graphics::loadSprites(Json::Value sprites)
       //Try to create a new sprite
       //NOTE - Sprites are loaded with no thought to their lifetime
       Graphics::Sprite* newSprite = new Graphics::Sprite( localFilename );
+      if ( newSprite == NULL )
+        Errors::err << "Sprite for " << localFilename << " was created NULL"
+                    << endl;
       
       //Add sprite to group it's respective group with appropriate name
       Graphics::sprites[ groupName ][ internalName ] = newSprite;
@@ -356,6 +365,7 @@ void Graphics::removeSprites()
   using Graphics::spriteGroupMap;
   using Graphics::spriteGroup;
 
+  Errors::dbg << "Removing sprites" << endl;
   //Iterate over groups
   for (spriteGroupMap::iterator groupItr = sprites.begin();
        groupItr != sprites.end();

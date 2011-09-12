@@ -42,7 +42,8 @@ namespace Errors
   // Messaging streams
   extern StreamFork err;
   extern std::stringstream errorStream;
-  extern std::stringstream dbg; // Debug info
+  extern StreamFork dbg; // Debug info
+  extern std::stringstream debugStream; // Debug info
 
   // Utility functions
   std::string reverseByDelim( std::string reverseMe, char delimiter );
@@ -63,6 +64,9 @@ namespace Objects
       DebugDisplay( Json::Value data );
       void render();
   };
+
+  extern View errorView;
+  extern View debugView;
 };
 
 #endif
