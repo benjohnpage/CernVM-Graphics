@@ -75,6 +75,10 @@ string Networking::FileDownloader::getFile(string filename)
       Errors::err << "CURL Error in getting file \"" << filename << "\" - "
                   << curl_easy_strerror(result) << endl;
     }
+    else
+    {
+      Errors::dbg << "Successful file download of " << filename << endl;
+    }
 
     fclose(newFile);
   }

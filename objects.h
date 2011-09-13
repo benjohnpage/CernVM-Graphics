@@ -73,13 +73,14 @@ namespace Objects
   {
     public:
       Slideshow(Json::Value data);
+      void update();
       void render();
     private:
       int self_time;
       int self_timeout;
       
       std::string self_spriteGroup;
-      Graphics::spriteGroup::iterator self_spriteIter;
+      size_t self_slidePos;
   };
 
   class Gridshow: public Object

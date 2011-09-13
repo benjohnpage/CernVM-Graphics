@@ -198,7 +198,7 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
   self_timeout(30)
 {
   self_spriteGroup = data["sprites"].asString();
-  self_spriteIter = Graphics::sprites[ self_spriteGroup ].begin();
+  self_slidePos = 0;
   
   self_timeout = data["timeout"].asInt();
 
@@ -222,35 +222,56 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
     self_coordType = Objects::NORM;
   }
   else
-  {
-    // We assume that the sprites in slideshow are all the same size
-    autoDimensions( self_spriteIter -> second );
-  }
+    // This handles the dimensions, which need to change on update too
+    update(); 
 }
 
 
 void Objects::Slideshow::render()
 {
+  using Graphics::spriteGroup;
+  using Graphics::sprites;
+  using std::advance;
+
   //Iteratiiiiing
   if (self_time  == self_timeout)
   {
     self_time = 0;
-    self_spriteIter++;
+    self_slidePos++;
 
-    if (self_spriteIter == Graphics::sprites[self_spriteGroup].end())
-      self_spriteIter = Graphics::sprites[self_spriteGroup].begin();
+    if ( self_slidePos == Graphics::sprites[ self_spriteGroup ] . size() )
+      self_slidePos = 0;
   }
   else
     self_time++;
 
-  if ( self_coordType == Objects::NORM )
-    self_spriteIter -> second -> draw(self_x, self_y, self_w, self_h);
+  spriteGroup::iterator drawIter = sprites[ self_spriteGroup ].begin();
+  advance( drawIter, self_slidePos );
+  
 
-  if ( self_coordType == Objects::NON_NORM )
-    self_spriteIter -> second -> draw( (int)self_x, (int)self_y, 
-                                       (int)self_w, (int)self_h);
+  if ( drawIter == sprites[ self_spriteGroup ] . end() )
+  {
+    Errors::err << "Slideshow drawIter past end of group" << endl;
+  }
+  else
+  {
+    if ( self_coordType == Objects::NORM )
+      drawIter -> second -> draw(self_x, self_y, self_w, self_h);
+
+    if ( self_coordType == Objects::NON_NORM )
+      drawIter -> second -> draw( (int)self_x, (int)self_y, 
+                                         (int)self_w, (int)self_h);
+  }
 }
 
+void Objects::Slideshow::update()
+{
+
+  // Safety, don't calculate dimensions for an empty group
+  if ( Graphics::sprites[ self_spriteGroup ] . size() != 0 )
+    // We assume that the sprites in slideshow are all the same size
+    autoDimensions(Graphics::sprites[ self_spriteGroup ].begin() -> second);
+}
 
 Objects::BoincValue::BoincValue(Json::Value data) : 
   Objects::Object( data )
@@ -495,7 +516,7 @@ void Objects::Gridshow::render()
   {
     self_slidePos++;
     size_t groupSize = Graphics::sprites[self_spriteGroup].size();
-    if ( self_slidePos  * self_numCells > groupSize )
+    if ( self_slidePos  * self_numCells >= groupSize )
       self_slidePos = 0;
     
     self_time = 0;
