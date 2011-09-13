@@ -111,6 +111,8 @@ void updateConfiguration( CURL* indexHandle )
       Graphics::removeSprites();
       Json::Value sprites = newConfig["sprites"];
       Graphics::loadSprites(sprites);
+
+      Objects::updateObjects();
     }
 
     // Maybe one day a more intelligent solution can be employed as 

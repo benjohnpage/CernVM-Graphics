@@ -83,6 +83,21 @@ void Objects::loadObjects( Json::Value objects )
   Objects::activeView = &Objects::viewList[0];
 }
 
+void Objects::updateObjects()
+{
+  using Objects::viewList;
+  
+  for ( size_t viewIndex = 0; viewIndex < viewList.size(); viewIndex++)
+  {
+    for ( size_t objIndex = 0; objIndex < viewList[viewIndex].size(); 
+          objIndex++ )
+    {
+      viewList[viewIndex][objIndex] -> update();
+    }
+    
+  }
+}
+
 void Objects::removeObjects()
 {
   using Objects::viewList;
@@ -152,6 +167,13 @@ void Objects::Object::autoDimensions(Sprite* sprite)
   // If a dimension is missing, extract it from the aspect ratio
   if ( self_w == 0 || self_h == 0 )
   {
+    // Safety
+    if ( sprite == NULL )
+    {
+      Errors::err << "Null sprite provided in autoDimensions." << endl
+                  << "Unable to extract dimensions." << endl;
+      return;
+    }
     // Get a screen based aspect ratio
     double drawnAspect = sprite -> aspectRatio();
 
@@ -163,6 +185,12 @@ void Objects::Object::autoDimensions(Sprite* sprite)
     if (self_h == 0)
       self_h = self_w / drawnAspect;
   }
+}
+
+void Objects::Object::update()
+{
+  // This is a placeholder function, to allow objects to update with new
+  // content. They don't *have* to do this, however - so it's only virtual.
 }
 
 Objects::Slideshow::Slideshow( Json::Value data ) :
@@ -270,15 +298,48 @@ Objects::StringDisplay::StringDisplay(Json::Value data) :
 
   self_lineWidth = data["lineWidth"].asInt();
   self_delimiter = data["delimiter"].asString();
-  
-  Json::Value strings;
-  strings = data["strings"];
 
-  if (data["external"].isBool())
-    if (data["external"] == true)
+  // This processes the string data
+  update();
+  
+}
+
+void Objects::StringDisplay::render()
+{
+  if ( self_coordType == Objects::NON_NORM )
+  {
+    int pixelWidthPerChar = 12;
+    for (size_t i = 0; i < self_displayStrings.size(); i++)
     {
-      string resource = data["resource"].asString();
-      string node     = data["node"].asString();
+      int drawX = self_x + i * pixelWidthPerChar * self_lineWidth;
+      Graphics::drawText(self_displayStrings[i], drawX, (int)self_y);
+    }
+  }
+
+  if ( self_coordType == Objects::NORM )
+  {
+    double fracWidthPerChar = 0.011;
+    for (size_t i = 0; i < self_displayStrings.size(); i++)
+    {
+      double drawX = self_x + i * fracWidthPerChar * self_lineWidth;
+      Graphics::drawText(self_displayStrings[i], drawX, self_y);
+    }
+  }
+}
+
+void Objects::StringDisplay::update()
+{
+  // Make sure repeated calls to this function don't simply add strings
+  self_displayStrings.clear();
+
+  Json::Value strings;
+  strings = self_data["strings"];
+
+  if (self_data["external"].isBool())
+    if (self_data["external"] == true)
+    {
+      string resource = self_data["resource"].asString();
+      string node     = self_data["node"].asString();
       strings = Resources::getResourceNode(resource, node);
     }
   
@@ -304,7 +365,7 @@ Objects::StringDisplay::StringDisplay(Json::Value data) :
     outputStream << "\n";
 
     lineN++;
-    if (lineN == self_maxLines)
+    if ( lineN == self_maxLines )
     {
       self_displayStrings.push_back(outputStream.str());
       lineN = 0;
@@ -314,29 +375,6 @@ Objects::StringDisplay::StringDisplay(Json::Value data) :
   }
   //Add remaining string
   self_displayStrings.push_back( outputStream.str() );
-}
-
-void Objects::StringDisplay::render()
-{
-  if ( self_coordType == Objects::NON_NORM )
-  {
-    int pixelWidthPerChar = 12;
-    for (size_t i = 0; i < self_displayStrings.size(); i++)
-    {
-      int drawX = self_x + i * pixelWidthPerChar * self_lineWidth;
-      Graphics::drawText(self_displayStrings[i], drawX, (int)self_y);
-    }
-  }
-
-  if ( self_coordType == Objects::NORM )
-  {
-    double fracWidthPerChar = 0.011;
-    for (size_t i = 0; i < self_displayStrings.size(); i++)
-    {
-      double drawX = self_x + i * fracWidthPerChar * self_lineWidth;
-      Graphics::drawText(self_displayStrings[i], drawX, self_y);
-    }
-  }
 }
 
 Objects::SpriteDisplay::SpriteDisplay(Json::Value data) :
@@ -369,7 +407,8 @@ Objects::Gridshow::Gridshow(Json::Value data) :
 
   Json::Value dimensions = data["dimensions"];
 
-  autoDimensions( Graphics::sprites[ self_spriteGroup ].begin() -> second );
+  // This calls the automatic dimension functions
+  update();
 
   self_slidePos = 0;
 
@@ -461,6 +500,14 @@ void Objects::Gridshow::render()
     
     self_time = 0;
   }
+}
+
+void Objects::Gridshow::update()
+{
+  if ( Graphics::sprites[ self_spriteGroup ] . size() == 0 )
+    Errors::err << "Gridshow is empty, cannot calculate dimensions." << endl;
+  else
+    autoDimensions( Graphics::sprites[ self_spriteGroup ].begin() -> second );
 }
 
 Objects::PanSprite::PanSprite( Json::Value data ) :

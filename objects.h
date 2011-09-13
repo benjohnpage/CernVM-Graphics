@@ -15,6 +15,7 @@
 namespace Objects
 {
   void loadObjects(Json::Value objects);
+  void updateObjects();
   void removeObjects();
 
   enum CoordType { NORM, NON_NORM };
@@ -23,6 +24,7 @@ namespace Objects
   {
     public:
       Object(Json::Value data);
+      virtual void update();
       virtual void render() = 0;
     protected:
       Json::Value self_data;
@@ -49,6 +51,7 @@ namespace Objects
   {
     public:
       StringDisplay(Json::Value data);
+      void update();
       void render();
     private:
       std::vector<std::string> self_displayStrings;
@@ -83,6 +86,7 @@ namespace Objects
   {
     public:
       Gridshow(Json::Value data);
+      void update();
       void render();
     private:
       int self_cellsWide;
