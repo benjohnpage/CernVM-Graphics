@@ -21,14 +21,16 @@ BOINC_LIBRARY_DIRS = -L$(BOINC_DIR) \
     -L$(BOINC_API_DIR) \
     -L$(BOINC_LIB_DIR)
 
-PROGS = screensaver
+PROGS = jsoncpp screensaver
 
 all: $(PROGS)
+.PHONY: jsoncpp
 
 clean: 
-	rm $(PROGS) *.o
+	rm screensaver *.o
+	cd JsonCpp; python scons.py -c platform=linux-gcc
 
-JsonCpp/libs/*:
+jsoncpp:
 	cd JsonCpp; python scons.py platform=linux-gcc
 
 networking.o: networking.cpp 
