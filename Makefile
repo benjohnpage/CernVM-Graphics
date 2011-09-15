@@ -24,6 +24,7 @@ BOINC_LIBRARY_DIRS = -L$(BOINC_DIR) \
 PROGS = jsoncpp screensaver
 
 all: $(PROGS)
+.PHONY: jsoncpp
 
 clean: 
 	rm screensaver *.o

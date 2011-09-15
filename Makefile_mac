@@ -51,10 +51,11 @@ LDFLAGS_X86_64 = -Wl,-syslibroot,/Developer/SDKs/MacOSX10.5.sdk,-arch,x86_64
 PROGS = jsoncpp cernvmwrapper_graphics_x86_64 
 
 all: $(PROGS)
+.PHONY: jsoncpp
 
 clean: 
 	rm cernvmwrapper_graphics_x86_64 *.o
-	cd JsonCpp; python -c scons.py platform=linux-gcc
+	cd JsonCpp; python scons.py -c platform=linux-gcc
 
 
 cernvmwrapper_graphics_x86_64: export MACOSX_DEPLOYMENT_TARGET=10.5
