@@ -69,7 +69,7 @@ errors_x86_64.o: errors.cpp
 
 networking_x86_64.o: networking.cpp 
 	$(CXX_X86_64) -c $(CXXFLAGS_X86_64) \
-	-I$(BOINC_LIB_DIR) \
+	-I$(BOINC_LIB_DIR) -I$(JSONCPP_INC_DIR) \
 	-o networking_x86_64.o networking.cpp
 
 resources_x86_64.o: resources.cpp 
