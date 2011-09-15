@@ -1,0 +1,49 @@
+# CernVM-Graphics Style Commentary
+
+Stylistically, this project has been written with two principles in mind:
+
+* If it doesn't fit in 76 characters, you're doing it wrong.
+
+* Make it obvious where everything has come from
+
+The first stems from having written the project in vim in an 80 character wide
+terminal. What's more there must always be space for the vim option ":set nu"
+to be used, which takes up to 4 characters itself.
+
+The second is a really the defining principle of the style and is presrent to
+help promote readability of the code, and ease of entry for any new developer.
+
+## Style constraints:
+
+  * 76 character line maximum.
+  
+  * The using keyword - never use it at the global scope. Use `using namespace
+    SPACE` very sparingly, usually it's far more explicit to write `using
+    SPACE::MEMBER`. In this case anyone can figure out where anything comes
+    from without having to venture outside of the scope
+
+  * Object member variables must be prepended with "self_". This decision is
+    because member variables are automatically within scope of member
+    functions, so it must be made clear that they ARE member variables, else
+    it is not easily obvious.
+
+  * Object member functions can be named without the "self_", as they are
+    often used from outside. What's more they don't suffer from the "assignment
+    problem" that member variables do. However, within the context of other
+    member functions they should be referred to via prepended with "this ->".
+    Again this wouldn't work with member variables due to the "assignment
+    problem", however we would still like to make it known that they are
+    member functions in an obvious way.
+
+  * Scope entry - No "{" at the ends of lines, it should be on it's own line.
+
+  * Indentation - 2 spaces per scope.
+
+### Variable Naming
+
+  * Types (i.e. classes) - UpperCamelCase
+
+  * Namespaces - UpperCamelCase
+
+  * Everything else - lowerCamelCase
+  

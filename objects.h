@@ -3,6 +3,7 @@
 
 //Ours
 #include "graphics.h"
+#include "errors.h"
 
 //JsonCpp
 #include <json/json.h>
@@ -26,6 +27,10 @@ namespace Objects
       Object(Json::Value data);
       virtual void update();
       virtual void render() = 0;
+
+      // Personalised output streams
+      Errors::StreamFork& err();
+      Errors::StreamFork& dbg();
     protected:
       Json::Value self_data;
       double      self_x;
@@ -121,10 +126,28 @@ namespace Objects
       double self_displayDim;
   };
 
+  // Error Objects - in errors.cpp
+  class ErrorDisplay : public Object
+  {
+    public:
+      ErrorDisplay( Json::Value data );
+      void render();
+  };
+
+  class DebugDisplay : public Object
+  {
+    public:
+      DebugDisplay( Json::Value data );
+      void render();
+  };
+
   typedef std::vector< Objects::Object* > View;
   typedef std::vector< Objects::View >    ViewList;
   extern ViewList viewList;
   extern View*    activeView;
+
+  extern View errorView;
+  extern View debugView;
 };
 
 #endif

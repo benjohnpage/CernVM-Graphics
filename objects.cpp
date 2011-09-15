@@ -146,6 +146,16 @@ Objects::Object::Object(Json::Value data) :
   }
 }
 
+Errors::StreamFork& Objects::Object::err()
+{
+  return Errors::err << self_data["type"].asString() << ": ";
+}
+
+Errors::StreamFork& Objects::Object::dbg()
+{
+  return Errors::dbg << self_data["type"].asString() << ": ";
+}
+
 void Objects::Object::autoDimensions(Sprite* sprite)
 {
   // This function contains a lot of oft used functionality for importing
@@ -159,8 +169,7 @@ void Objects::Object::autoDimensions(Sprite* sprite)
   if ( (self_w == 0) and (self_h == 0) )
   {
     string objectType = self_data["type"].asString();
-    Errors::err << "No dimensions given for " << objectType << endl 
-                << "Attempting zero dimensions." << endl;
+    this -> err() << "No dimensions given. Attempting zero dimensions." << endl;
     return;
   }
 
@@ -170,8 +179,8 @@ void Objects::Object::autoDimensions(Sprite* sprite)
     // Safety
     if ( sprite == NULL )
     {
-      Errors::err << "Null sprite provided in autoDimensions." << endl
-                  << "Unable to extract dimensions." << endl;
+      this -> err() << "Null sprite provided in autoDimensions." << endl
+                    << "Unable to extract dimensions." << endl;
       return;
     }
     // Get a screen based aspect ratio
@@ -212,9 +221,9 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
     //we pretend it was meant to and complain
     if (dimensions != "fullscreen")
     {
-      Errors::err << "ERROR: Slideshow - provided dimensions as string, "
-                  << "but does not want fullscreen, interpretting as "
-                  << "fullscreen anyway." << endl;
+      this -> err() << "Provided dimensions as string, but does not want'
+                    << " fullscreen, interpretting as fullscreen anyway."
+                    << endl;
     }
 
     self_x = -0.5f;
@@ -226,7 +235,7 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
   }
   else
     // This handles the dimensions, which need to change on update too
-    update(); 
+    this -> update(); 
 }
 
 
@@ -267,11 +276,11 @@ void Objects::Slideshow::render()
 
 void Objects::Slideshow::update()
 {
-
+  using Graphics::sprites;
   // Safety, don't calculate dimensions for an empty group
-  if ( Graphics::sprites[ self_spriteGroup ] . size() != 0 )
+  if ( sprites[ self_spriteGroup ] . size() != 0 )
     // We assume that the sprites in slideshow are all the same size
-    autoDimensions(Graphics::sprites[ self_spriteGroup ].begin() -> second);
+    this -> autoDimensions(sprites[ self_spriteGroup ].begin() -> second);
 }
 
 Objects::BoincValue::BoincValue(Json::Value data) : 
@@ -322,7 +331,7 @@ Objects::StringDisplay::StringDisplay(Json::Value data) :
   self_delimiter = data["delimiter"].asString();
 
   // This processes the string data
-  update();
+  this -> update();
   
 }
 
@@ -406,7 +415,7 @@ Objects::SpriteDisplay::SpriteDisplay(Json::Value data) :
 
   Json::Value dimensions = data["dimensions"];
 
-  autoDimensions( Graphics::getSprite( self_spriteName ) );
+  this -> autoDimensions( Graphics::getSprite( self_spriteName ) );
 
 }
 
@@ -430,7 +439,7 @@ Objects::Gridshow::Gridshow(Json::Value data) :
   Json::Value dimensions = data["dimensions"];
 
   // This calls the automatic dimension functions
-  update();
+  this -> update();
 
   self_slidePos = 0;
 
@@ -516,10 +525,12 @@ void Objects::Gridshow::render()
 
 void Objects::Gridshow::update()
 {
-  if ( Graphics::sprites[ self_spriteGroup ] . size() == 0 )
-    Errors::err << "Gridshow is empty, cannot calculate dimensions." << endl;
+  using Graphics::sprites;
+  if ( sprites[ self_spriteGroup ] . size() == 0 )
+    this -> err() << "Sprite group is empty, cannot calculate dimensions." 
+                  << endl;
   else
-    autoDimensions( Graphics::sprites[ self_spriteGroup ].begin() -> second );
+    this -> autoDimensions( sprites[ self_spriteGroup ].begin() -> second );
 }
 
 Objects::PanSprite::PanSprite( Json::Value data ) :
@@ -535,7 +546,7 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   if (dimensions["displayW"].isNull() == dimensions["displayH"].isNull() )
   {
-    Errors::err << "Both/neither of 'displayW' and 'displayH' are set." 
+    this -> err() << "Both/neither of 'displayW' and 'displayH' are set." 
                 << endl
                 << "Setting displayW to dimensions[w]" << endl;
     dimensions["displayW"] = dimensions["w"].asDouble();
@@ -558,8 +569,8 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
   if ( data["period"].isNull() )
   {
-    Errors::err << "PanSprite period is NULL, but required." << endl
-                << "Setting period to 100 frames" << endl;
+    this -> err() << "PanSprite period is NULL, but required." << endl
+                  << "Setting period to 100 frames" << endl;
     self_panPeriod = 100;
   }
 

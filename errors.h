@@ -6,7 +6,6 @@
 #include <string>
 
 #include "json/json.h"
-#include "objects.h"
 
 namespace Errors
 {
@@ -47,26 +46,6 @@ namespace Errors
 
   // Utility functions
   std::string reverseByDelim( std::string reverseMe, char delimiter );
-};
-
-namespace Objects
-{
-  class ErrorDisplay : public Object
-  {
-    public:
-      ErrorDisplay( Json::Value data );
-      void render();
-  };
-
-  class DebugDisplay : public Object
-  {
-    public:
-      DebugDisplay( Json::Value data );
-      void render();
-  };
-
-  extern View errorView;
-  extern View debugView;
 };
 
 #endif
