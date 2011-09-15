@@ -191,6 +191,9 @@ void Objects::Object::update()
 {
   // This is a placeholder function, to allow objects to update with new
   // content. They don't *have* to do this, however - so it's only virtual.
+  
+  // DESIGN NOTE - Please place error messages here. Error messages in the
+  // render function are near useless due to the frequency of the calling.
 }
 
 Objects::Slideshow::Slideshow( Json::Value data ) :
@@ -249,11 +252,9 @@ void Objects::Slideshow::render()
   advance( drawIter, self_slidePos );
   
 
-  if ( drawIter == sprites[ self_spriteGroup ] . end() )
-  {
-    Errors::err << "Slideshow drawIter past end of group" << endl;
-  }
-  else
+  // If there's a sprite at our iterator. (If the group is empty then begin()
+  // is also end() and so not a sprite)
+  if ( drawIter != sprites[ self_spriteGroup ] . end() )
   {
     if ( self_coordType == Objects::NORM )
       drawIter -> second -> draw(self_x, self_y, self_w, self_h);
@@ -450,16 +451,6 @@ void Objects::Gridshow::render()
   int gridX = 0;
   int gridY = 0;
 
-  // A little protection ;)
-  if ( Graphics::sprites[self_spriteGroup].size() == 0 )
-  {
-    Errors::err << "Sprite group \"" << self_spriteGroup << "\" is empty."
-                << endl
-                << "Gridshow will not be rendered." << endl;
-    return;
-  }
-
-
   //Drawing loop - start at the current sprite
   Graphics::spriteGroup::iterator drawIter = 
                                     Graphics::sprites[self_spriteGroup].begin();
@@ -468,14 +459,16 @@ void Objects::Gridshow::render()
   //We draw "self_numCells" sprites
   for (int i = 0; i < self_numCells; i++)
   {
+    // If the iterator no longer gives us a real sprite, then break
+    if ( drawIter == Graphics::sprites[self_spriteGroup] . end() )
+      break;
+
     Sprite* cellSprite = drawIter -> second;
+
+    // No need for error message, as you should already know that it's NULL
+    // by previous errors
     if ( cellSprite == NULL )
-    {
-      Errors::err << "Trying to draw NULL sprite in Gridshow (index " << i
-                  << ")." << endl 
-                  << "Skipping cell." << endl;
       continue;
-    }
     
     if ( self_coordType == Objects::NON_NORM )
     {
@@ -500,10 +493,8 @@ void Objects::Gridshow::render()
       gridY++;
     }
 
-    //Do appropriate incriment of draw iterator (including looping).
+    // Move to next sprite
     drawIter++;
-    if ( drawIter == Graphics::sprites[self_spriteGroup] . end() )
-      break;
   }
 
   // Increment the timer
