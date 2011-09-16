@@ -455,17 +455,29 @@ Objects::Gridshow::Gridshow(Json::Value data) :
 
 void Objects::Gridshow::render()
 {
+  // This loops the slides. We do it here to make sure that if the group
+  // size changes, we'll end up at an appropriate place.
+  if (self_time == self_timeout)
+  {
+    self_slidePos += self_numCells;
+    size_t groupSize = Graphics::sprites[self_spriteGroup].size();
+    if ( self_slidePos  >= groupSize )
+      self_slidePos = 0;
+    
+    self_time = 0;
+  }
+
   using Graphics::Sprite;
   using std::advance;
-
-  int gridX = 0;
-  int gridY = 0;
 
   //Drawing loop - start at the current sprite
   Graphics::spriteGroup::iterator drawIter = 
                                     Graphics::sprites[self_spriteGroup].begin();
   advance( drawIter, self_slidePos );
  
+  int gridX = 0;
+  int gridY = 0;
+
   //We draw "self_numCells" sprites
   for (int i = 0; i < self_numCells; i++)
   {
@@ -509,19 +521,6 @@ void Objects::Gridshow::render()
 
   // Increment the timer
   self_time++;
-  // If the timer == the timeout then it's time to switch to the new grid
-  // The new grid will begin with the sprites after the ones just displayed
-  // So we simply set self_spriteIter to drawIter.
-  // (Think about it for a second :) )
-  if (self_time == self_timeout)
-  {
-    self_slidePos += self_numCells;
-    size_t groupSize = Graphics::sprites[self_spriteGroup].size();
-    if ( self_slidePos  >= groupSize )
-      self_slidePos = 0;
-    
-    self_time = 0;
-  }
 }
 
 void Objects::Gridshow::update()
