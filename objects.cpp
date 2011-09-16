@@ -26,7 +26,7 @@ using Graphics::Sprite;
 Objects::ViewList Objects::viewList;
 Objects::View*    Objects::activeView;
 
-Objects::KeyHandlerList Objects::keyHandlers;
+Objects::KeyHandlerMap Objects::keyHandlers;
 
 void Objects::loadObjects( Json::Value objects )
 {
@@ -334,7 +334,6 @@ Objects::StringDisplay::StringDisplay(Json::Value data) :
 
   // This processes the string data
   this -> update();
-  
 }
 
 void Objects::StringDisplay::render()
@@ -637,3 +636,10 @@ void Objects::PanSprite::render()
   if ( self_panTime == self_panPeriod || self_panTime == 0 )
     self_panDirection = (Direction) -self_panDirection;
 }
+
+// Key handling
+
+Objects::KeyHandler::KeyHandler( Objects::Object* _object, 
+                                 Objects::KeyHandleFunc _keyFunc )
+  : object(_object), keyFunc(_keyFunc)
+{}

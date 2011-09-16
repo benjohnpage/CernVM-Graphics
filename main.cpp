@@ -295,7 +295,7 @@ void boinc_app_key_press(int key, int)
     Objects::activeView = &Objects::debugView;
   else if ( key == 101 )
     Objects::activeView = &Objects::errorView;
-  else if ( key >=49 and key <= 58 )
+  else if ( key >= 49 and key <= 58 )
   {
     // viewNumber from 0 - 9, with 1 -> 0 and 0 -> 9 (key -> viewNumber)
     size_t viewNumber = key - 49;
@@ -305,15 +305,17 @@ void boinc_app_key_press(int key, int)
 
   }
 
-  for (size_t i = 0; i < Objects::keyHandlers.size(); i++)
+  if (Objects::keyHandlers.find( key ) != Objects::keyHandlers.end() )
   {
-    Objects::KeyHandleFunc keyFunc = Objects::keyHandlers[i].keyFunc;
-    Objects::Object*       object  = Objects::keyHandlers[i].object;
-
-    (object->*keyFunc)();
-
+    for (size_t i = 0; i < Objects::keyHandlers[key].size(); i++)
+    {
+      Objects::KeyHandleFunc keyFunc = Objects::keyHandlers[key][i].keyFunc;
+      Objects::Object*       object  = Objects::keyHandlers[key][i].object;
+  
+      (object->*keyFunc)();
+  
+    }
   }
-
 }
 
 void boinc_app_key_release(int, int){}

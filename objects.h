@@ -60,9 +60,9 @@ namespace Objects
       void render();
     private:
       std::vector<std::string> self_displayStrings;
-      std::string         self_delimiter;
-      int            self_maxLines;
-      int            self_lineWidth;
+      std::string              self_delimiter;
+      int                      self_maxLines;
+      int                      self_lineWidth;
   };
 
   class SpriteDisplay: public Object
@@ -150,15 +150,18 @@ namespace Objects
   extern View errorView;
   extern View debugView;
 
+  // Key handling
   typedef void (Object::*KeyHandleFunc)();
   struct KeyHandler
   {
-    KeyHandleFunc keyFunc;
+    KeyHandler(Object* _object, KeyHandleFunc _keyFunc);
     Object*       object;
+    KeyHandleFunc keyFunc;
   };
   
-  typedef std::vector< KeyHandler> KeyHandlerList;
-  extern KeyHandlerList keyHandlers;
+  typedef std::vector< KeyHandler > KeyHandlerList;
+  typedef std::map< int, KeyHandlerList > KeyHandlerMap;
+  extern KeyHandlerMap keyHandlers;
 };
 
 #endif
