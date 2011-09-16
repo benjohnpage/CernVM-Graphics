@@ -178,9 +178,10 @@ void app_graphics_render(int xs, int ys, double timestamp)
   if ( Share::data == NULL )
     Share::data = (Share::SharedData*) boinc_graphics_get_shmem( "cernvm" );
   else 
+  {
+    Errors::err << "Fraction done: " << Share::data -> fraction_done << endl;
     Share::data -> countdown = 5;
-
-
+  }
 
   //CURL Downloading 
   Networking::fileDownloader -> process();
@@ -305,15 +306,10 @@ void boinc_app_key_press(int key, int)
 
   }
 
-  using Objects::keyHandlers;
-  using Objects::KeyHandlerList;
-  if (keyHandlers.find( key ) != keyHandlers.end() )
+  for ( Objects::View::iterator object = Objects::activeView -> begin();
+        object != Objects::activeView -> end(); object ++)
   {
-    for (KeyHandlerList::iterator handler = keyHandlers[ key ].begin();
-         handler != keyHandlers[key] . end(); handler ++)
-    {
-       handler -> run();
-    }
+    (*object) -> keyHandler(key);
   }
 }
 

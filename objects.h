@@ -28,6 +28,8 @@ namespace Objects
       virtual void update();
       virtual void render() = 0;
 
+      virtual void keyHandler(int key);
+
       // Personalised output streams
       Errors::StreamFork& err();
       Errors::StreamFork& dbg();
@@ -150,19 +152,6 @@ namespace Objects
   extern View errorView;
   extern View debugView;
 
-  // Key handling
-  typedef void (Object::*KeyHandleFunc)();
-  struct KeyHandler
-  {
-    KeyHandler(Object* _object, KeyHandleFunc _keyFunc);
-    Object*       object;
-    KeyHandleFunc keyFunc;
-    void run();
-  };
-  
-  typedef std::vector< KeyHandler > KeyHandlerList;
-  typedef std::map< int, KeyHandlerList > KeyHandlerMap;
-  extern KeyHandlerMap keyHandlers;
 };
 
 #endif

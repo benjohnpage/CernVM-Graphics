@@ -26,8 +26,6 @@ using Graphics::Sprite;
 Objects::ViewList Objects::viewList;
 Objects::View*    Objects::activeView;
 
-Objects::KeyHandlerMap Objects::keyHandlers;
-
 void Objects::loadObjects( Json::Value objects )
 {
   // This function loads all the objects in the provided Json structure into
@@ -205,6 +203,12 @@ void Objects::Object::update()
   
   // DESIGN NOTE - Please place error messages here. Error messages in the
   // render function are near useless due to the frequency of the calling.
+}
+
+void Objects::Object::keyHandler(int key)
+{
+  // This is a placeholder function, to allow objects to respond to key 
+  // input. They don't *have* to do this, however - so it's only virtual.
 }
 
 Objects::Slideshow::Slideshow( Json::Value data ) :
@@ -636,14 +640,3 @@ void Objects::PanSprite::render()
     self_panDirection = (Direction) -self_panDirection;
 }
 
-// Key handling
-
-Objects::KeyHandler::KeyHandler( Objects::Object* _object, 
-                                 Objects::KeyHandleFunc _keyFunc )
-  : object(_object), keyFunc(_keyFunc)
-{}
-
-void Objects::KeyHandler::run()
-{
-      (object->*keyFunc)();
-}
