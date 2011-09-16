@@ -178,10 +178,7 @@ void app_graphics_render(int xs, int ys, double timestamp)
   if ( Share::data == NULL )
     Share::data = (Share::SharedData*) boinc_graphics_get_shmem( "cernvm" );
   else 
-  {
-    Errors::err << "Fraction done: " << Share::data -> fraction_done << endl;
     Share::data -> countdown = 5;
-  }
 
   //CURL Downloading 
   Networking::fileDownloader -> process();

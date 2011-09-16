@@ -287,6 +287,12 @@ void Objects::Slideshow::update()
   if ( sprites[ self_spriteGroup ] . size() != 0 )
     // We assume that the sprites in slideshow are all the same size
     this -> autoDimensions(sprites[ self_spriteGroup ].begin() -> second);
+
+  // Protection, to stop std::advance hanging if it invalidates an iterator.
+  // Note, if you still get occasional hangs it's possible that this should be
+  // >=
+  if ( self_slidePos > sprites[ self_spriteGroup ] . size() )
+    self_slidePos = 0;
 }
 
 Objects::BoincValue::BoincValue(Json::Value data) : 
@@ -459,8 +465,7 @@ Objects::Gridshow::Gridshow(Json::Value data) :
 
 void Objects::Gridshow::render()
 {
-  // This loops the slides. We do it here to make sure that if the group
-  // size changes, we'll end up at an appropriate place.
+  // This loops the slides. 
   if (self_time == self_timeout)
   {
     self_slidePos += self_numCells;
@@ -535,6 +540,14 @@ void Objects::Gridshow::update()
                   << endl;
   else
     this -> autoDimensions( sprites[ self_spriteGroup ].begin() -> second );
+
+  // Protection, stops std::advance hitting an infinite loop (this happens if
+  // std::advance ends up invalidating our iterators)
+  // Note, if you still get occasional hangs it's possible that this should be
+  // >=
+  if ( self_slidePos > sprites[self_spriteGroup].size() )
+    self_slidePos = 0;
+  
 }
 
 Objects::PanSprite::PanSprite( Json::Value data ) :
