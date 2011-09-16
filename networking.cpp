@@ -204,15 +204,7 @@ void Networking::FileDownloader::process()
       CURLcode result  = message -> data.result;
       CURL* easyHandle = message -> easy_handle;
 
-      if (result  == CURLE_COULDNT_CONNECT)
-      {
-        //If we couldn't connect, retry the handle as we really should be
-        //able to.
-        curl_multi_remove_handle(self_multiHandle, easyHandle);
-        curl_multi_add_handle   (self_multiHandle, easyHandle);
-        self_numActive++;
-      }
-      else if (result == CURLE_OK)
+      if (result == CURLE_OK)
       {
         Networking::FileInformation completedFile = 
                                                  self_fileInfos[easyHandle];
@@ -236,14 +228,24 @@ void Networking::FileDownloader::process()
       }
       else
       {
-        //Unhandled error catcher
-        Networking::FileInformation completedFile = 
-                                                 self_fileInfos[easyHandle];
-        string errorDescription = curl_easy_strerror(result);
+        //If we couldn't connect, retry the handle as we really should be
+        //able to.
+        curl_multi_remove_handle(self_multiHandle, easyHandle);
+        curl_multi_add_handle   (self_multiHandle, easyHandle);
+        self_numActive++;
 
-        Errors::err << "Unhandled error downloading \"" 
-                    << completedFile.filePath 
-                    << "\" - " << errorDescription<< endl;
+        // If it isn't a "couldn't connect" then relay an error message
+        // Couldn't connect is special as this will happen with no VM present
+        if (result  != CURLE_COULDNT_CONNECT)
+        {
+          Networking::FileInformation completedFile = 
+                                                 self_fileInfos[easyHandle];
+          string errorDescription = curl_easy_strerror(result);
+  
+          Errors::err << "Unhandled error downloading \"" 
+                      << completedFile.filePath 
+                      << "\" - " << errorDescription << endl;
+        }
       }
     }
   }

@@ -464,7 +464,7 @@ void Objects::Gridshow::render()
   //Drawing loop - start at the current sprite
   Graphics::spriteGroup::iterator drawIter = 
                                     Graphics::sprites[self_spriteGroup].begin();
-  advance( drawIter, self_slidePos * self_numCells );
+  advance( drawIter, self_slidePos );
  
   //We draw "self_numCells" sprites
   for (int i = 0; i < self_numCells; i++)
@@ -515,9 +515,9 @@ void Objects::Gridshow::render()
   // (Think about it for a second :) )
   if (self_time == self_timeout)
   {
-    self_slidePos++;
+    self_slidePos += self_numCells;
     size_t groupSize = Graphics::sprites[self_spriteGroup].size();
-    if ( self_slidePos  * self_numCells >= groupSize )
+    if ( self_slidePos  >= groupSize )
       self_slidePos = 0;
     
     self_time = 0;
