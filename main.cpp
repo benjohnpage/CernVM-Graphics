@@ -246,7 +246,7 @@ void app_graphics_init()
   //Set up the downloader (index downloading done in main loop)
   using Networking::fileDownloader;
   using Networking::FileDownloader;
-  string defaultServer = "http://localhost:8080";
+  string defaultServer = "http://localhost:7859";
   fileDownloader = new FileDownloader(defaultServer);
 
   //Create the display object that says "not connected to VM"
@@ -305,15 +305,14 @@ void boinc_app_key_press(int key, int)
 
   }
 
-  if (Objects::keyHandlers.find( key ) != Objects::keyHandlers.end() )
+  using Objects::keyHandlers;
+  using Objects::KeyHandlerList;
+  if (keyHandlers.find( key ) != keyHandlers.end() )
   {
-    for (size_t i = 0; i < Objects::keyHandlers[key].size(); i++)
+    for (KeyHandlerList::iterator handler = keyHandlers[ key ].begin();
+         handler != keyHandlers[key] . end(); handler ++)
     {
-      Objects::KeyHandleFunc keyFunc = Objects::keyHandlers[key][i].keyFunc;
-      Objects::Object*       object  = Objects::keyHandlers[key][i].object;
-  
-      (object->*keyFunc)();
-  
+       handler -> run();
     }
   }
 }

@@ -643,3 +643,8 @@ Objects::KeyHandler::KeyHandler( Objects::Object* _object,
                                  Objects::KeyHandleFunc _keyFunc )
   : object(_object), keyFunc(_keyFunc)
 {}
+
+void Objects::KeyHandler::run()
+{
+      (object->*keyFunc)();
+}

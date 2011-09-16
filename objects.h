@@ -157,6 +157,7 @@ namespace Objects
     KeyHandler(Object* _object, KeyHandleFunc _keyFunc);
     Object*       object;
     KeyHandleFunc keyFunc;
+    void run();
   };
   
   typedef std::vector< KeyHandler > KeyHandlerList;
