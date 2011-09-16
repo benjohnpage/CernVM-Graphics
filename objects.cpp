@@ -26,6 +26,8 @@ using Graphics::Sprite;
 Objects::ViewList Objects::viewList;
 Objects::View*    Objects::activeView;
 
+Objects::KeyHandlerList Objects::keyHandlers;
+
 void Objects::loadObjects( Json::Value objects )
 {
   // This function loads all the objects in the provided Json structure into
@@ -221,7 +223,7 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
     //we pretend it was meant to and complain
     if (dimensions != "fullscreen")
     {
-      this -> err() << "Provided dimensions as string, but does not want'
+      this -> err() << "Provided dimensions as string, but does not want"
                     << " fullscreen, interpretting as fullscreen anyway."
                     << endl;
     }

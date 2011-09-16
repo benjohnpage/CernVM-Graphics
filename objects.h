@@ -146,8 +146,19 @@ namespace Objects
   extern ViewList viewList;
   extern View*    activeView;
 
+  // Error view - in errors.cpp
   extern View errorView;
   extern View debugView;
+
+  typedef void (Object::*KeyHandleFunc)();
+  struct KeyHandler
+  {
+    KeyHandleFunc keyFunc;
+    Object*       object;
+  };
+  
+  typedef std::vector< KeyHandler> KeyHandlerList;
+  extern KeyHandlerList keyHandlers;
 };
 
 #endif

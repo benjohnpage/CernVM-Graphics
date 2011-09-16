@@ -305,6 +305,15 @@ void boinc_app_key_press(int key, int)
 
   }
 
+  for (size_t i = 0; i < Objects::keyHandlers.size(); i++)
+  {
+    Objects::KeyHandleFunc keyFunc = Objects::keyHandlers[i].keyFunc;
+    Objects::Object*       object  = Objects::keyHandlers[i].object;
+
+    (object->*keyFunc)();
+
+  }
+
 }
 
 void boinc_app_key_release(int, int){}
