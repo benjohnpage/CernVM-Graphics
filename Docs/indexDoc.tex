@@ -131,22 +131,6 @@
   ``spriteName'' is the internal name of the sprite, and spriteFilename is 
   the filename to load from the VM.
 
-\section{Coordinates}
-  A brief aside on coordinates within the graphics application. Below,
-  everything is given in non-normalised cartesian coordinates. By
-  ``non-normalised'' I mean that an increment of one in the x or y dimensio
-  means one pixel in that direction. What's more the origin is the centre
-  of the window. This means that non-normalised coordinates will range from
-  $-w/2 < x < w/2$, $-h/2 < y < h/2$.
-
-  To allow for easy scaling to fullscreen (as any good screensaver should)
-  the graphics app also supports normalised coordinates. These are fractions
-  of the ``drawable width'' and ``drawable height'', and mean that the
-  coordinates are in the range $-0.5 < x < 0.5$, $-0.5 < y < 0.5$. The 
-  concept of the ``drawable'' sizes is to do with keeping a fixed aspect 
-  ratio, regardless of the target platforms resolution. Currently this 
-  aspect ratio is fixed at 16:10, so the coordinates respect these sizes.
-
 
 \section{Objects} 
 \subsection{Overview}
@@ -171,7 +155,7 @@
     ]
   \end{verbatim}
 
-  The objects currently supported by the graphics app are:
+  The objects currently supported by the \cernvmgraphics{} are:
   \begin{enumerate}
     \item boincValue
     \item stringDisplay
@@ -186,6 +170,56 @@
   (bottom-left origin).
   They are described soon, but first we must discuss ``views''.
 
+  \subsection{Dimensions}
+  A brief aside on coordinates within \cernvmgraphics{}. Below,
+  everything is given in non-normalised cartesian coordinates. By
+  ``non-normalised'' I mean that an increment of one in the x or y dimensio
+  means one pixel in that direction. What's more the origin is the centre
+  of the window. This means that non-normalised coordinates will range from
+  $-w/2 < x < w/2$, $-h/2 < y < h/2$.
+
+  To allow for easy scaling to fullscreen (as any good screensaver should)
+  the \cernvmgraphics{} also supports normalised coordinates. These are 
+  fractions of the ``drawable width'' and ``drawable height'', and mean 
+  that the coordinates are in the range $-0.5 < x < 0.5$, $-0.5 < y < 0.5$.
+  The concept of the ``drawable'' sizes is to do with keeping a fixed aspect
+  ratio, regardless of the target platforms resolution. Currently this 
+  aspect ratio is fixed at 16:10, so the coordinates respect these sizes.
+
+  In the context of an object coordinates usually turn up within the
+  "dimensions" parameter. This is standard within objects so we describe it
+  here to alleviate any confusion. The types of dimension often differ
+  between objects but ALL objects are guaranteed to be positioned in some
+  way - they have an x and a y, e.g.:
+
+  \begin{verbatim}
+    "dimensions" :
+    {
+      "x" : 0,
+      "y" : 0
+    }
+  \end{verbatim}
+
+  As these are both integers, \cernvmgraphics{} will assume non-normalised
+  coordinates. If either were a double, then it would assume normalised
+  coordinates. 
+  
+  In most cases there is often a width and a height parameter. This extends
+  our dimensions node to:
+
+  \begin{verbatim}
+    "dimensions" :
+    {
+      "x" : 0,
+      "y" : 0,
+      "w" : 0.5,
+      "h" : 0.5
+    }
+  \end{verbatim}
+
+  As "w" and "h" are both doubles, all the dimensions are thought to
+  represent normalised coordinates. Any extra (object specific) dimensions
+  are stated in the object descriptions.
   \subsection{Views}
   Simply put a view is a collection of objects that you want to be
   displayed at any given time. To switch between views you press any of the
@@ -251,9 +285,9 @@
   This object displays a collection of key-value pairs, split apart by
   a delimiter. The position given by the dimensions describes the bottom
   left of the top string. The strings are given as a map of key value pairs.
-  The keys should be strings, but the values can be strings or numbers. Any
-  number will be interpretted as an energy in GeV and printed as such.
-  This map can either be given internally or externally. 
+  The keys should be strings, but the values can be strings or numbers
+  (though numbers will be convered to strings internally). This map can 
+  either be given internally or externally. 
 
   To do it internally provide the parameter ``strings'', e.g.:
 
