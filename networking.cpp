@@ -72,12 +72,12 @@ string Networking::FileDownloader::getFile(string filename)
 
     if (result != CURLE_OK) 
     {
-      Errors::err << "CURL Error in getting file \"" << filename << "\" - "
+      Errors::err << "CURL Error in getting file \"" << offsitePath << "\" - "
                   << curl_easy_strerror(result) << endl;
     }
     else
     {
-      Errors::dbg << "Successful file download of " << filename << endl;
+      Errors::dbg << "Successful file download of " << offsitePath << endl;
     }
 
     fclose(newFile);
