@@ -46,21 +46,28 @@ using std::endl;
 #include "networking.h"
 #include "errors.h"
 
-//Global variables
+///////////////////////////////////////////////////
+// Global variables (Correspend to global state) // 
+///////////////////////////////////////////////////
+
 Share::SharedData* Share::data;
 
+// CernVM-Graphics timing variables
+double reportedTime;
+bool   paused;
 double timeOfUpdate;
 double updatePeriod; //Defaults to 0
 
 string forcedConfigFile;
 Json::Value appConfig;
 
+
 void updateConfiguration( CURL* indexHandle )
 {
-  //Open config file (default name "/index.json")
+  // Opens config file (default name "/index.json")
   string indexFilename;
   
-  // Or have we been given a forced config file at run time?
+  // Check for forced configuration file from command line
   if (forcedConfigFile != "")
   {
     Errors::dbg << "Using forced config file: " << forcedConfigFile << endl;
@@ -173,18 +180,30 @@ void updateConfiguration( CURL* indexHandle )
 
 void app_graphics_render(int xs, int ys, double timestamp)
 {
-  //Boinc Shared Memory
+  ////////////////////////////////////////////////////////////////
+  // Update Time (so we can manage the reported time ourselves) //
+  ////////////////////////////////////////////////////////////////
+  if ( ! paused )
+    reportedTime = timestamp;
 
+
+  // Boinc Shared Memory
   if ( Share::data == NULL )
     Share::data = (Share::SharedData*) boinc_graphics_get_shmem( "cernvm" );
   else 
     Share::data -> countdown = 5;
 
-  //CURL Downloading 
+
+  // CURL Downloading 
   Networking::fileDownloader -> process();
 
-  //Update every "updatePeriod" seconds (this also does the initial download
-  if (timestamp - timeOfUpdate > updatePeriod)
+
+  //////////////////////////////////////////////////////////
+  // Updating code - this also does the initial download. //
+  //////////////////////////////////////////////////////////
+
+  // Updates every "updatePeriod" seconds
+  if ( reportedTime - timeOfUpdate > updatePeriod )
   {
     // Only update if the updatePeriod is > 0 or it's the first time
     if ( updatePeriod > 0 or ( updatePeriod == 0 and appConfig.isNull() ) )
@@ -199,7 +218,7 @@ void app_graphics_render(int xs, int ys, double timestamp)
         fileDownloader->addFile("/index.json", indexInfo);
       }
 
-      timeOfUpdate = timestamp;
+      timeOfUpdate = reportedTime;
     }
   }
 
@@ -223,7 +242,7 @@ void app_graphics_render(int xs, int ys, double timestamp)
 
   //Object handling
   for (size_t i = 0; i < Objects::activeView -> size(); i++)
-    Objects::activeView -> at(i) -> render();
+    Objects::activeView -> at(i) -> render( reportedTime );
 
   Graphics::end2D();
 }
@@ -233,10 +252,13 @@ void app_graphics_resize(int width, int height)
   glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
+////////////////////////////////////////////////////////////////////////////
+//                         App init function                              //
+////////////////////////////////////////////////////////////////////////////
 void app_graphics_init()
 {
-
   //Initialises the resources for the application.
+  paused = false;
 
   char fontFolder[] = ".";
   txf_load_fonts(fontFolder);
@@ -289,6 +311,7 @@ void boinc_app_key_press(int key, int)
   {
     boinc_close_window_and_quit("Escape Pressed");
   }
+  // View changing!
   else if ( key == 100 )
     Objects::activeView = &Objects::debugView;
   else if ( key == 101 )
@@ -302,12 +325,20 @@ void boinc_app_key_press(int key, int)
       Objects::activeView = & Objects::viewList . at ( viewNumber );
 
   }
+  // Pausing ( global variable )
+  else if ( key == 112 )
+  {
+    Errors::dbg << "Paused: " << paused << std::endl;
+    paused = !paused;
+  }
 
+  // Object specific key presses
   for ( Objects::View::iterator object = Objects::activeView -> begin();
         object != Objects::activeView -> end(); object ++)
   {
     (*object) -> keyHandler(key);
   }
+
 }
 
 void boinc_app_key_release(int, int){}

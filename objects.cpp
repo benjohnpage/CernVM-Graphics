@@ -212,13 +212,23 @@ void Objects::Object::keyHandler(int key)
 }
 
 Objects::Slideshow::Slideshow( Json::Value data ) :
-  Objects::Object( data ), self_time(0),
-  self_timeout(30)
+  Objects::Object( data ), self_lastUpdate(0), self_slidePos(0)
 {
   self_spriteGroup = data["sprites"].asString();
-  self_slidePos = 0;
   
-  self_timeout = data["timeout"].asInt();
+  if ( data["timeout"] . isInt() )
+  {
+    // Hangover from old code, we choose to make it 30fps
+    self_timeout =  (1.0/30)*data["timeout"].asInt();
+  }
+  else if ( data["timeout"] . isDouble() )
+    self_timeout = data["timeout"] . asDouble();
+  else
+  {
+    // Default to three seconds and error
+    self_timeout = 3.0;
+    this -> err() << "No timeout set, defaulting to 3.0 seconds";
+  }
 
   Json::Value dimensions = data["dimensions"];
   if ( dimensions.isString() )
@@ -245,23 +255,25 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
 }
 
 
-void Objects::Slideshow::render()
+void Objects::Slideshow::render( double timestamp )
 {
   using Graphics::spriteGroup;
   using Graphics::sprites;
   using std::advance;
 
-  //Iteratiiiiing
-  if (self_time  == self_timeout)
+  // Can't do the initialisation of self_lastUpdate anywhere else
+  if ( self_lastUpdate == 0 )
+    self_lastUpdate = timestamp;
+
+  // Iterate slides
+  if ( timestamp - self_lastUpdate  > self_timeout )
   {
-    self_time = 0;
+    self_lastUpdate = timestamp;
     self_slidePos++;
 
     if ( self_slidePos == Graphics::sprites[ self_spriteGroup ] . size() )
       self_slidePos = 0;
   }
-  else
-    self_time++;
 
   spriteGroup::iterator drawIter = sprites[ self_spriteGroup ].begin();
   advance( drawIter, self_slidePos );
@@ -302,7 +314,7 @@ Objects::BoincValue::BoincValue(Json::Value data) :
   self_type   = data["valueType"].asString();
 }
 
-void Objects::BoincValue::render()
+void Objects::BoincValue::render( double timestamp )
 {
   //The assumption is that the shared memory is updated regularly in the
   //graphics loop
@@ -346,7 +358,7 @@ Objects::StringDisplay::StringDisplay(Json::Value data) :
   this -> update();
 }
 
-void Objects::StringDisplay::render()
+void Objects::StringDisplay::render( double timestamp )
 {
   if ( self_coordType == Objects::NON_NORM )
   {
@@ -430,7 +442,7 @@ Objects::SpriteDisplay::SpriteDisplay(Json::Value data) :
 
 }
 
-void Objects::SpriteDisplay::render()
+void Objects::SpriteDisplay::render( double timestamp )
 {
   Sprite* drawSprite = Graphics::getSprite( self_spriteName );
 
@@ -443,7 +455,7 @@ void Objects::SpriteDisplay::render()
 }
 
 Objects::Gridshow::Gridshow(Json::Value data) :
-  Objects::Object( data )
+  Objects::Object( data ), self_lastUpdate(0), self_slidePos(0)
 {
   self_spriteGroup = data["sprites"].asString();
 
@@ -452,36 +464,51 @@ Objects::Gridshow::Gridshow(Json::Value data) :
   // This calls the automatic dimension functions
   this -> update();
 
-  self_slidePos = 0;
-
   //Cell settings
   self_cellsWide  = dimensions["cellsWide"].asInt();
   self_numCells   = data["numCells"].asInt();
 
-  self_time       = 0;
-  self_timeout    = data["timeout"].asInt();
+  if ( data["timeout"] . isInt() )
+  {
+    // Hangover from old code, we choose to make it 30fps
+    self_timeout =  (1.0/30)*data["timeout"].asInt();
+  }
+  else if ( data["timeout"] . isDouble() )
+    self_timeout = data["timeout"] . asDouble();
+  else
+  {
+    // Default to three seconds and error
+    self_timeout = 3.0;
+    this -> err() << "No timeout set, defaulting to 3.0 seconds";
+  }
+
 
 }
 
-void Objects::Gridshow::render()
+void Objects::Gridshow::render( double timestamp )
 {
+  // Can't set it to current time for first time anywhere else.
+  if ( self_lastUpdate == 0 )
+    self_lastUpdate = timestamp;
+
   // This loops the slides. 
-  if (self_time == self_timeout)
+  if (timestamp - self_lastUpdate > self_timeout)
   {
     self_slidePos += self_numCells;
     size_t groupSize = Graphics::sprites[self_spriteGroup].size();
     if ( self_slidePos  >= groupSize )
       self_slidePos = 0;
     
-    self_time = 0;
+    self_lastUpdate = timestamp;
   }
 
   using Graphics::Sprite;
+  using Graphics::sprites;
+  using Graphics::spriteGroup;
   using std::advance;
 
   //Drawing loop - start at the current sprite
-  Graphics::spriteGroup::iterator drawIter = 
-                                    Graphics::sprites[self_spriteGroup].begin();
+  spriteGroup::iterator drawIter = sprites[self_spriteGroup].begin();
   advance( drawIter, self_slidePos );
  
   int gridX = 0;
@@ -506,14 +533,14 @@ void Objects::Gridshow::render()
       int cellX = self_x + gridX * self_w;
       int cellY = self_y + gridY * self_h;
 
-      drawIter -> second -> draw( cellX, cellY, (int)self_w, (int) self_h );
+      cellSprite -> draw( cellX, cellY, (int)self_w, (int) self_h );
     }
     if ( self_coordType == Objects::NORM )
     {
       double cellX = self_x + gridX * self_w;
       double cellY = self_y + gridY * self_h;
 
-      drawIter -> second -> draw( cellX, cellY, self_w, self_h );
+      cellSprite -> draw( cellX, cellY, self_w, self_h );
     }
 
     //Do appropriate moving of drawing position
@@ -528,8 +555,6 @@ void Objects::Gridshow::render()
     drawIter++;
   }
 
-  // Increment the timer
-  self_time++;
 }
 
 void Objects::Gridshow::update()
@@ -593,7 +618,7 @@ Objects::PanSprite::PanSprite( Json::Value data ) :
 
 }
 
-void Objects::PanSprite::render()
+void Objects::PanSprite::render( double timestamp )
 {
   using namespace Graphics;
   Sprite* drawnSprite = getSprite( self_sprite );

@@ -53,7 +53,7 @@ Objects::ErrorDisplay::ErrorDisplay( Json::Value data )
   : Objects::Object( data )
 {}
 
-void Objects::ErrorDisplay::render()
+void Objects::ErrorDisplay::render(double timestamp)
 {
   // Simple rendering routine, we're just displaying the error stream as
   // text. It could probably do with an abilityto not fill over the screen
@@ -74,7 +74,7 @@ Objects::DebugDisplay::DebugDisplay( Json::Value data )
   : Objects::Object( data )
 {}
 
-void Objects::DebugDisplay::render()
+void Objects::DebugDisplay::render( double timestamp )
 {
   // Simple rendering routine, we're just displaying the error stream as
   // text. It could probably do with an abilityto not fill over the screen

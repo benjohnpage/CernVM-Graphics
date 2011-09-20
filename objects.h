@@ -26,9 +26,9 @@ namespace Objects
     public:
       Object(Json::Value data);
       virtual void update();
-      virtual void render() = 0;
+      virtual void render( double timestamp ) = 0;
 
-      virtual void keyHandler(int key);
+      void keyHandler(int key);
 
       // Personalised output streams
       Errors::StreamFork& err();
@@ -48,7 +48,7 @@ namespace Objects
   {
     public:
       BoincValue(Json::Value data);
-      void render();
+      void render( double timestamp );
     private:
       std::string self_type;
       std::string self_prefix;
@@ -59,7 +59,7 @@ namespace Objects
     public:
       StringDisplay(Json::Value data);
       void update();
-      void render();
+      void render( double timestamp );
     private:
       std::vector<std::string> self_displayStrings;
       std::string              self_delimiter;
@@ -71,7 +71,7 @@ namespace Objects
   {
     public:
       SpriteDisplay(Json::Value data);
-      void render();
+      void render( double timestamp );
     private:
       std::string self_spriteName;
   };
@@ -81,10 +81,10 @@ namespace Objects
     public:
       Slideshow(Json::Value data);
       void update();
-      void render();
+      void render( double timestamp );
     private:
-      int self_time;
-      int self_timeout;
+      double self_lastUpdate;
+      double self_timeout;
       
       std::string self_spriteGroup;
       size_t self_slidePos;
@@ -95,13 +95,13 @@ namespace Objects
     public:
       Gridshow(Json::Value data);
       void update();
-      void render();
+      void render( double timestamp );
     private:
       int self_cellsWide;
       int self_numCells;
 
-      int self_time;
-      int self_timeout;
+      double self_lastUpdate;
+      double self_timeout;
       
       std::string self_spriteGroup;
       size_t self_slidePos;
@@ -111,7 +111,7 @@ namespace Objects
   {
     public: 
       PanSprite(Json::Value data);
-      void render();
+      void render( double timestamp );
     private:
       std::string self_sprite;
 
@@ -133,14 +133,14 @@ namespace Objects
   {
     public:
       ErrorDisplay( Json::Value data );
-      void render();
+      void render( double timestamp );
   };
 
   class DebugDisplay : public Object
   {
     public:
       DebugDisplay( Json::Value data );
-      void render();
+      void render( double timestamp );
   };
 
   typedef std::vector< Objects::Object* > View;
