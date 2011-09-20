@@ -180,9 +180,7 @@ void updateConfiguration( CURL* indexHandle )
 
 void app_graphics_render(int xs, int ys, double timestamp)
 {
-  ////////////////////////////////////////////////////////////////
-  // Update Time (so we can manage the reported time ourselves) //
-  ////////////////////////////////////////////////////////////////
+  // Update Time (so we can manage the reported time ourselves)
   if ( ! paused )
     reportedTime = timestamp;
 
@@ -194,13 +192,12 @@ void app_graphics_render(int xs, int ys, double timestamp)
     Share::data -> countdown = 5;
 
 
-  // CURL Downloading 
-  Networking::fileDownloader -> process();
-
-
   //////////////////////////////////////////////////////////
   // Updating code - this also does the initial download. //
   //////////////////////////////////////////////////////////
+
+  // CURL Downloading 
+  Networking::fileDownloader -> process();
 
   // Updates every "updatePeriod" seconds
   if ( reportedTime - timeOfUpdate > updatePeriod )
@@ -347,7 +344,7 @@ void boinc_app_key_release(int, int){}
 //                             MAIN FUNCTION                              //
 ////////////////////////////////////////////////////////////////////////////
 
-int main( int argc, char** argv)
+int main( int argc, char** argv )
 {
   if (argc > 1)
   {

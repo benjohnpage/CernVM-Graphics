@@ -1,0 +1,52 @@
+\documentclass[a4paper]{article}
+
+\newcommand{\cernvmgraphics}{CernVM-Graphics}
+\newcommand{\boinc}{BOINC}
+
+\title{\cernvmgraphics{} Structure}
+\author{Ben Page}
+
+\begin{document}
+\maketitle
+
+\section{Entry Point and Initialisation}
+  \cernvmgraphics{} begins, as with all C++ programs, in the main function.
+  In main.cpp this is at the bottom of the file. Unlike a few functions this
+  is fairly short and just sets up the boinc "hooks" as well as parses
+  commandline arguments. ``--config='' forces a configuration file as
+  specified on the command line, but this may not work too well now
+  everything is grabbed from the VM. 
+  
+  ``boinc\_init\_graphics\_diagnostics'' calls the function 
+  ``app\_graphics\_init'' and ``boinc\_graphics\_loop'' enters rendering 
+  loop, ``app\_graphics\_render''. These are \boinc{} specified names.
+
+  ``app\_graphics\_init'' does some basic initialisation, setting up the
+  file downloader, loading fonts, setting the pause variable to false and
+  sets up the error/debugging views. Essentially setting up most everything
+  in the global scope that needs specific information. This is also where
+  you find the message ``Waiting for VM''.
+
+\section{Rendering Loop and Updating}
+  The rendering loop itself is fairly verbose and simply calls a lot of
+  other functions, relying on the current ``view'' being already populated.
+  At the top it does some basic management - only updating the time if we
+  aren't paused (all working code only gets a ``reported time'' rather than
+  the actual time), and it also updates the shared memory. The next section
+  downloads a new index.json every ``updatePeriod'' seconds and hooks a
+  success function ``updateConfiguration''. After this we find the rendering
+  code which simply runs through the objects in the active view. 
+
+  The key function for updating is ``updateConfiguration'', found near the
+  top of the source. It is an example of a FileDownloader ``responseFunc''
+  (see networking.h). In principle this is fairly simple, it is called
+  after downloading a configuration file and depending on if anything has
+  changed it will ``update'' the configuration. This means loading new
+  ``sprites'', ``objects'' and ``resources''. If the configuration doesn't
+  change then we check for changes in resources. If the resources have
+  changed then we download them all again.
+
+
+
+
+\end{document}
