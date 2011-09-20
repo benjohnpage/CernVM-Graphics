@@ -361,8 +361,10 @@
   required parameters are: the internal name of the group, the dimensions
   of the display (scaling is automatically supported) and the time between
   slides (given as a number of frames). The dimensions can either be the
-  string ``fullscreen'', or a normal dimensions object. For example the
-  slideshow object could be:
+  string ``fullscreen'', or a normal dimensions object. Also one passes a 
+  slide change timeout - ``timeout''. If it is an integer than it's a 
+  number of frames (at 30fps) and doubles are simply times in seconds.
+  For example the slideshow object could be:
 
   \begin{verbatim}
     {
@@ -385,7 +387,11 @@
   The required parameters are: the internal name of the group, the position,
   the individual cell dimensions (given as normal "w" and "h"), the number
   of cells wide that the grid will be, and the total number of cells to 
-  display per slide. For example this could be:
+  display per slide. Also (optionally) one can pass a slide change timeout
+  - ``timeout''. If it is an integer than it's a number of frames (at 30fps)
+  and doubles are simply times in seconds. No timeout means no slide
+  changing.
+  For example this could be:
 
   \begin{verbatim}
     {

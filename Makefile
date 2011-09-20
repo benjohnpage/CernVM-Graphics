@@ -27,7 +27,7 @@ all: $(PROGS)
 .PHONY: jsoncpp
 
 clean: 
-	rm screensaver *.o
+	rm screensaver *.o stderrgfx.txt
 	cd JsonCpp; python scons.py -c platform=linux-gcc
 
 jsoncpp:

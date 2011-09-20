@@ -225,9 +225,9 @@ Objects::Slideshow::Slideshow( Json::Value data ) :
     self_timeout = data["timeout"] . asDouble();
   else
   {
-    // Default to three seconds and error
+    // Default to 3 second refresh and error
     self_timeout = 3.0;
-    this -> err() << "No timeout set, defaulting to 3.0 seconds";
+    this -> err() << "No timeout specified, defaulting to 3 seconds";
   }
 
   Json::Value dimensions = data["dimensions"];
@@ -266,7 +266,7 @@ void Objects::Slideshow::render( double timestamp )
     self_lastUpdate = timestamp;
 
   // Iterate slides
-  if ( timestamp - self_lastUpdate  > self_timeout )
+  if ( self_timeout > 0 and timestamp - self_lastUpdate > self_timeout)
   {
     self_lastUpdate = timestamp;
     self_slidePos++;
@@ -279,8 +279,8 @@ void Objects::Slideshow::render( double timestamp )
   advance( drawIter, self_slidePos );
   
 
-  // If there's a sprite at our iterator. (If the group is empty then begin()
-  // is also end() and so not a sprite)
+  // If there's a sprite at our iterator. (If the group is empty then 
+  // begin() is also end() and so not a sprite)
   if ( drawIter != sprites[ self_spriteGroup ] . end() )
   {
     if ( self_coordType == Objects::NORM )
@@ -477,9 +477,8 @@ Objects::Gridshow::Gridshow(Json::Value data) :
     self_timeout = data["timeout"] . asDouble();
   else
   {
-    // Default to three seconds and error
-    self_timeout = 3.0;
-    this -> err() << "No timeout set, defaulting to 3.0 seconds";
+    // Default to no refresh
+    self_timeout = 0.0;
   }
 
 
@@ -492,7 +491,7 @@ void Objects::Gridshow::render( double timestamp )
     self_lastUpdate = timestamp;
 
   // This loops the slides. 
-  if (timestamp - self_lastUpdate > self_timeout)
+  if ( self_timeout > 0 and timestamp - self_lastUpdate > self_timeout)
   {
     self_slidePos += self_numCells;
     size_t groupSize = Graphics::sprites[self_spriteGroup].size();

@@ -22,10 +22,9 @@
      [ 
       {
         "type"       : "gridshow",
-        "dimensions" : { "x": -0.4, "y": -0.3, "h": 0.4, "cellsWide" : 3 },
+        "dimensions" : { "x": -0.27, "y": -0.3, "h": 0.8, "cellsWide" : 3 },
         "sprites"    : "histograms",
-        "timeout"    : 100,
-        "numCells"   : 6
+        "numCells"   : 1
       },
       {
         "type"       : "boincValue",
